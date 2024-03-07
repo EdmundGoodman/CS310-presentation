@@ -12,23 +12,30 @@
 \usepackage{pgfplots}
 \usepgfplotslibrary{dateplot}
 
+\usepackage{csquotes}
+\usepackage[normalem]{ulem}
+
+\usepackage[backend=biber,style=numeric, citestyle=ieee]{biblatex}
+\addbibresource{references.bib}
+
 \usepackage{amssymb}
-\usepackage{enumitem}
-% Fix beamer with enumitem (https://tex.stackexchange.com/a/24491)
-\setitemize{label=\usebeamerfont*{itemize item}%
-  \usebeamercolor[fg]{itemize item}
-  \usebeamertemplate{itemize item}}
-% Add todo list macro in beamer
-\newlist{todolist}{enumerate}{2}
-\setlist[todolist]{label=$\square$}
 \usepackage{pifont}
-\newcommand{\cmark}{\ding{51}}%
-\newcommand{\xmark}{\ding{55}}%
-\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\cmark}}%
-\hspace{-2.5pt}}
-\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\xmark}}
+\usepackage{xcolor}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\newcommand{\done}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\textcolor{green}{\cmark}}}\hspace{-2.5pt}}
+\newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\textcolor{red}{\xmark}}}
+\newcommand{\partialdone}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\textcolor{orange}{\cmark}}}\hspace{-2.5pt}}
 
-
+\setbeameroption{show notes} % un-comment to see the notes
+% % https://tex.stackexchange.com/a/553261
+% \setbeamertemplate{note page} 
+% { 
+% \insertslideintonotes{0.01} 
+% \rule{\textwidth}{0.1pt} 
+% %\color{blue} \scriptsize
+% \insertnote 
+% }
 
 \title{Assessing the Viability of Rust in HPC}
 \subtitle{3rd year project presentation}
@@ -52,9 +59,13 @@
 \begin{frame}{Before we begin...}
 \begin{itemize}
     \item<1-> The performance analysis section will analyse benchmark runs
+    \vspace*{0.5cm}
+    \item<2-> I'm going to use a tool I built to start some of on DCS batch compute
+        % \note<2>{\texttt{ssh kudu}\newline}
+        % \note<2>{\texttt{cd ~/Desktop/project/hpccg-rs/hpc-multibench}\newline}
+        % \note<2>{\texttt{poetry run python3 -m hpc\_multibench -y yaml\_examples/kudu/strong\_weak\_scaling.yaml record}}
     \begin{itemize}
-        \item<2-> I'm going to use a tool I built to spawn some benchmark runs
-        \item<3-> We will come back and explore them later, once they have completed!
+        \item \alert{We will come back and explore them later, once they have completed!}
     \end{itemize}
 \end{itemize}
 \end{frame}
@@ -62,58 +73,157 @@
 \section{Project Background}
 
 \begin{frame}{The Rust Language \ i}
+    % \begin{tikzpicture}[remember picture,overlay]
+    %     \node[xshift=-1.2cm,yshift=-1.8cm] at (current page.north east) {\includegraphics[width=0.15\textwidth]{images/ferris.png}};
+    % \end{tikzpicture}
     \begin{itemize}
         \item Originally developed by Mozilla, and released in 2010
-        \item Voted "most loved" programming language
-        \item 
+            \note[item]{Relatively young language, 14 years to C++'s 45\newline}
+        \item Its website claims \cite{RustProgrammingLanguage} it is:
+        \begin{itemize}
+            \item Performant
+                \note[item]{No garbarge collection needed}
+                \note[item]{Offers low-level abstraction for machine\newline}
+            \item Reliable
+                \note[item]{Rich type system, with foundation in programming languages like Haskell}
+                \note[item]{Offers low-level abstractions for the computer hardware, facilitating performant code\newline}
+            \item Productive
+                \note[item]{Robust toolchain, including canonical linters (\texttt{clippy}), auto-formatters (\texttt{rustfmt}), and a centralised package repository (\texttt{crates.io})\newline}
+        \end{itemize}
+        \vspace*{0.25cm}
+        \item Eliminates ``undefined behaviour'' by compiler rules
+            \note[item]{Specifically, its ownership model which works by counting mutable and immutable references to data}
+        \begin{itemize}
+            \item Encompasses memory and thread safety
+            \item Over 70\% of security bugs in the Chromium project related to memory safety \cite{MemorySafety} % serious security bugs
+        \end{itemize}
+        \vspace*{0.25cm}
+        \item Voted ``most loved'' programming language in StackOverflow's developer survey \cite{StackOverflowDeveloper}
     \end{itemize}
-% Originally developed by Mozilla, and released in 2010
-% Voted "most loved" programming language
-% Background in functional languages
-% Undefined behaviour prohibition
-% Solves lots of bugs
-% Recent attention from US govenment (security) / google (1million dollars for C++/rust interop)
 \end{frame}
 
 \begin{frame}{The Rust Language \ ii}
-    Has been in the news in the last month due to:
+    % \begin{tikzpicture}[remember picture,overlay]
+    %     \node[xshift=-1.2cm,yshift=-1.8cm] at (current page.north east) {\includegraphics[width=0.15\textwidth]{images/ferris.png}};
+    % \end{tikzpicture}
+    Has been in the news even in the last month due to:
     \begin{itemize}
         \item White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'' \cite{PressReleaseFuture2024}  % (February 26th)
-        \item Google pledging \$1 million to improve Rust/C++ interoperability\footnote{Including mentioning \texttt{autocxx}, a tool to which I have pull requested integration tests}\cite{ImprovingInteroperabilityRust}  % (February 5th)
+            \note[item]{Explicitly mentioning moving critical codebases to Rust as a part of US national cyber security policy}
+        \item Google pledging \$1 million to improve Rust/C++ interoperability \cite{ImprovingInteroperabilityRust}  % (February 5th)
+        \begin{itemize}
+            \item<2-> \alert{Blog post mentions tooling such as \texttt{autocxx} as part of this effort}
+                \note[item]{\texttt{autocxx}, is a tool to which I had already pull requested integration tests in the course of the project}
+        \end{itemize}
+    \end{itemize}
+
+    \vspace{0.5cm}
+    \begin{figure}[H]
+        \includegraphics[width=0.95\textwidth]{images/autocxx_pr.png}
+        \caption{A screenshot of my merged pull request into \texttt{autocxx}.}
+        \label{fig:warwick_mantevo_link}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{High-Performance Computing}
+    \begin{displayquote}
+        \vspace{0.2cm}
+        ``Technology that uses clusters of powerful processors, working in parallel, to process massive multidimensional datasets (big data) and solve complex problems at extremely high speeds.'' -- IBM \cite{WhatHPCIntroduction}
+    \end{displayquote}
+    \vspace*{0.5cm}
+    \begin{itemize}
+        \item Often referred to by the initialism ``HPC''
+        \item Key characteristics from definition:
+        \begin{itemize}
+            \item Parallel computation
+                \note[item]{Within UMA machines with vectorisation and threading}
+                \note[item]{Across NUMA clusters over TCP/IP networks\newline}
+            \item Large data-sets
+            \item \alert{High speeds}
+                \note[item]{Overall goal of HPC is going as fast as possible...}
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
-% \begin{frame}{High-Performance Computing}
-    % Intro to HPC
-    % Intro to Mantevo mini-apps for benchmarking
-% \end{frame}
+\begin{frame}{High-Performance Computing}
+    The original Mantevo Suite paper \cite{heroux2013mantevo} which pioneered the concept defines mini-apps (also called proxy applications) as:  % Prof Stephen Jarvis was on the development team
+    \begin{displayquote}
+        \vspace{0.2cm}
+        ``Small software programs whose performance characteristics model full-scale applications, yet require only a fraction of the lines of code, making [them] easier to study, design, and rewrite.''
+    \end{displayquote}
+\end{frame}
 
-% \begin{frame}{HPCCG}
-    % Original mantevo mini-app
-    % History
-    % What it does
-    % Why I selected it
-% \end{frame}
+\begin{frame}{Warwick's Link to the Mantevo Suite}
+    \begin{figure}[H]
+        \includegraphics[width=0.35\textwidth]{images/warwick_mantevo_link.png}
+        \caption{A screenshot of an appendix to the original Mantevo Suite paper, showing Stephen Jarvis' support for the project \cite{heroux2013mantevo}.}
+        \label{fig:warwick_mantevo_link}
+    \end{figure}
+\end{frame}
 
-% \begin{frame}{P$^3$ HPC - not just performance!}
-    % Performance
-    %  - This is what we will assess!
-    %  - Rust needs to nearly or as fast as C++ to be viable
-    % Productivity
-    %  - Ergonomic syntax (most loved language...)
-    %  - Good, canonical toolchain
-    %  - Properties which make writing bug-free code easier
-    % Portability
-    %  - Rust tooling is very portable!
-    %  - not like c++ with 5+ different proprietary compilers with slightly different flags
-    %  - still capable of machine-specific optimisations with native architecture flag
-% \end{frame}
+\begin{frame}{High Performance Computing Conjugate Gradients (HPCCG) \ i}
+    \begin{columns}[T,onlytextwidth]
+        \column{0.5\textwidth}
+            \begin{itemize}
+                \vspace{0.25cm}
+                \item ``The original Mantevo mini-app'' \cite{MantevoHPCCG2023}
+                \vspace{0.5cm}
+                \item Designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{heroux2013mantevo}
+                \item Based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952 \cite{hestenesMethodsConjugateGradients1952}
+                \item A small C++ codebase with dependent only on \texttt{OpenMP} and \texttt{MPI}
+            \end{itemize}
+        \column{0.5\textwidth}
+            \hspace{1cm}
+            \begin{figure}[H]
+                \includegraphics[width=0.75\textwidth]{images/acacgs_silo_output.png}
+                \captionsetup{width=.9\linewidth}
+                \caption{A screenshot of a silo visualisation from ACACGS, a C translation of HPCCG by Richard Kirk used in the CS257 coursework.}
+                \label{fig:warwick_mantevo_link}
+            \end{figure}
+    \end{columns}
+\end{frame}
 
-% \begin{frame}{Existing work}
-    % Existence of previous work motivates it as an interesting topic
-% % Why it can be misleading
-% % Subjectivity
-% \end{frame}
+\begin{frame}{High Performance Computing Conjugate Gradients (HPCCG) \ ii}
+    % TODO: Regenerate images with terminal background set to #fafafa
+    \begin{figure}
+        \begin{subfigure}[t]{.45\textwidth}\centering
+            \includegraphics[width=0.95\textwidth]{images/hpccg-run.png}
+            \label{fig:hpccg-run}
+            \captionsetup{width=0.95\textwidth}
+            \caption{Running HPCCG, and the first section of its output}
+        \end{subfigure}%
+        \begin{subfigure}[t]{.45\textwidth}\centering
+            \includegraphics[width=0.95\textwidth]{images/hpccg-perf.png}
+            \label{fig:hpccg-perf}
+            \captionsetup{width=0.95\textwidth}
+            \caption{The performance section of the HPCCG output}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{P$^3$HPC - not just performance!}
+    % TODO: Re-work this slide? Add some images or something?
+
+    \textbf{Why might Rust be a good fit for HPC?}
+    \begin{itemize}
+        % \item <2-> Performance
+        \item \alert<2>{Performance}
+            \note[item]{This is something the project assesses!}
+            \note[item]{Rust needs to nearly or as fast as C++ to be viable\newline}
+        \vspace*{1cm}
+        % \item <3-> Productivity
+        \item \alert<3>{Productivity}
+            \note[item]{Ergonomic syntax, most loved language with rich type system etc.}
+            \note[item]{Good, canonical toolchain (\texttt{cargo}, \texttt{rustfmt}, \texttt{clippy}, ...)}
+            \note[item]{Compiler check which make writing bug-free code easier\newline}
+        \vspace*{1cm}
+        % \item <4-> Portability
+        \item \alert<4>{Portability}
+            \note[item]{Rust toolchain is very portable (\texttt{rustc} / \texttt{LLVM} vs \texttt{gcc}, \texttt{icpc}, \texttt{clang}, ...)} % not like c++ with 5+ different proprietary compilers with slightly different flags
+            \note[item]{Still capable of machine-specific optimisations with native architecture flag}
+    \end{itemize}
+\end{frame}
+
 
 
 
@@ -126,10 +236,11 @@
     % This makes translation more difficult
 \end{frame}
 
-\begin{frame}{Writing Performant Rust}
-    % There are a number of tricks you can do to make Rust more performant
-    % Many are enumerated in the Rust Performance Book
-\end{frame}
+% \begin{frame}{Writing Performant Rust}
+%     % TODO: Drop this slide
+%     % There are a number of tricks you can do to make Rust more performant
+%     % Many are enumerated in the Rust Performance Book
+% \end{frame}
 
 \begin{frame}[fragile]{Fearless Parallelism in Rust}
     \begin{itemize}
@@ -138,11 +249,12 @@
             \item The borrow checker provides strong guarantees against race conditions/undefined behaviour during parallel execution
         \end{itemize}
         \vspace*{0.5cm}
+        % TODO: Could compare to PThreads as well?
         \item<2-> The \texttt{rayon} crate provides an even higher-level abstraction for parallelism than \texttt{OpenMP}, with stronger correctness guarantees
         \begin{columns}[T,onlytextwidth]
             \centering
             \column{0.5\textwidth}
-            \begin{minted}[escapeinside=||]{rust}
+            \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn dot_product(
     lhs: &[f64], rhs: &[f64]
 ) -> f64 {
@@ -152,8 +264,9 @@ pub fn dot_product(
         .sum()
 }
             \end{minted}
+            % TOOD: Box around change
             \column{0.5\textwidth}
-            \begin{minted}[escapeinside=||]{rust}
+            \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn parallel_dot_product(
     lhs: &[f64], rhs: &[f64]
 ) -> f64 {
@@ -169,20 +282,23 @@ pub fn parallel_dot_product(
 
 \begin{frame}{Clustered Computing in Rust}
     \begin{itemize}
-        \item The Message Passing Interface (MPI) is a common way to distribute work across machines in a HPC computer cluster
-        \item MPI has native C++ and FORTRAN implementations of its standard specification
+        \item The Message Passing Interface (\texttt{MPI}) is a common way to distribute work across machines in a HPC computer cluster
+        \item \texttt{MPI} has native C++ and FORTRAN implementations of its standard specification
         \item The \texttt{mpi} crate provides bindings from Rust into the C++ implementation
         \begin{itemize}
             \item These bindings are designed to be ``rustic''
             \item They (so far\footnote{I am looking at pull requesting simple examples based on the integration tests}) have quite poor documentation
         \end{itemize}
+        % MPI spec
+        % TODO: Could add code example?
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Translation Workflow}
-    % Diagram of loop from translate -> equivalence check -> characterise performance
-    % Ease of these three steps constitute criteria for viability of moving from C++ to Rust in HPC
-\end{frame}
+% \begin{frame}{Translation Workflow}
+%     % TODO: Is this slide needed?
+%     % Diagram of loop from translate -> equivalence check -> characterise performance
+%     % Ease of these three steps constitute criteria for viability of moving from C++ to Rust in HPC
+% \end{frame}
 
 
 
@@ -190,6 +306,32 @@ pub fn parallel_dot_product(
 \section{Equivalence Checking}
 
 \begin{frame}{Equivalence Checking Techniques}
+
+    \begin{itemize}
+        \item Equivalence checking is critical to ensure performance comparisons are fair
+        \item Four different techniques considered
+        \begin{enumerate}
+            \item<1-> \alert<5>{End-to-end testing}
+            \begin{itemize}
+                \item Run the program and examine its output
+                \item Fairly effective for chaotic systems (like HPCCG), but can miss edge-cases in complex logic % Elucidated weird bug in both versions given non-associativity of floating point operations
+            \end{itemize}
+            \item<2-> Formal methods
+            \begin{itemize}
+                \item Techniques such as Hoare Logic \cite{hoareAxiomaticBasisComputer1969} allow formal reasoning about programs
+            \end{itemize}
+            \item<3-> LLVM analysis
+            \begin{itemize}
+                \item Since the translated code does the same thing, generated LLVM IR may look similar
+            \end{itemize}
+            \item<4-> \alert<5>{Unit testing}
+            \begin{itemize}
+                \item Drive small code units and examine their outputs
+                \item Can provide confidence about these units \textit{individually}
+                \item Requires manual duplication across both languages, if no tooling exists...
+            \end{itemize}
+        \end{enumerate}
+    \end{itemize}
     % End-to-end testing (is fairly effective for chaotic systems like HPCCG)
     %  - Elucidated weird bug in both versions given non-associativity of floating point operations
     % Unit testing
@@ -197,11 +339,120 @@ pub fn parallel_dot_product(
     % LLVM analysis (just compare some clang decompiled code? conclusion as could be helpful, but high effort to build such a tool)
 \end{frame}
 
-\begin{frame}{Novel tool \#1: Polyglotest}
-    % Platonic ideal of test-driven development diagram
-    % How can we do this within out translation workflow?
-    % Pitch idea
-    % Show it in action
+\begin{frame}{Unit Tests with Test-Driven Development}
+    \begin{figure}[H]
+        \hspace*{-1cm}
+        \includegraphics[width=0.45\textwidth]{images/excalidraw_tdd.png}
+        \caption{A diagram showing the top-level workflow of the Test-Driven Development methodology.}
+        \label{fig:tdd_workflow}
+    \end{figure}
+    \only<2>{\centering\large\alert{What if we could leverage this during translation...?}}
+\end{frame}
+
+\begin{frame}{Novel tool \#1: Polyglotest \ i}
+    \begin{overprint}
+        \onslide<1-5>
+            \begin{alertblock}{Key Insight}
+                \vspace*{0.25cm}
+                Running existing unit tests from the original implementation on the translated one gives strong guarantees of equivalence.
+            \end{alertblock}
+            \vspace*{1cm}
+            \begin{itemize}
+                \item<2-> Write/use existing unit tests for the original C++ code to drive translated Rust code
+                \begin{itemize}
+                    \item<3-> How?
+                    \item<4-> Use a ``foreign function interface'' bridge like \texttt{cxx}
+                \end{itemize}
+                \item<5-> \textit{But our software output is in Rust, shouldn't we be getting rid of C++ unit tests?}
+            \end{itemize}
+        \onslide<6->
+            \begin{alertblock}{Key Insight}
+                \vspace*{0.25cm}
+                Running existing unit tests from the \sout{original} \textit{translated} implementation on the \sout{translated} \textit{original} one gives strong guarantees of equivalence.
+            \end{alertblock}
+            \vspace*{1cm}
+            \begin{itemize}
+                \item<7-> Write unit tests for the \textit{translated Rust} code to drive \textit{original C++} code
+                \begin{itemize}
+                    \item Use a ``foreign function interface'' bridge like \texttt{autocxx}
+                \end{itemize}
+                \vspace*{0.5cm}
+                \item<8-> \alert{We can now do \textbf{pure} Test-Driven Development to translate our Rust code!}
+            \end{itemize}
+    \end{overprint}
+
+\end{frame}
+
+\begin{frame}[fragile]{Novel tool \#1: Polyglotest \ ii}
+        \begin{columns}[T,onlytextwidth]
+            \centering
+            \column{0.5\textwidth}
+            \begin{minted}[escapeinside=||,linenos,lastline=15]{rust}
+include_cpp! {
+    #include "ddot.hpp"
+    safety!(unsafe_ffi)
+    generate!("ddot")
+}
+
+#[test]
+fn test_ddot() {
+    let width = 3;
+    let lhs = vec![1.0, 2.0, 3.0];
+    let rhs = vec![3.0, 2.0, 1.0];
+
+    let result = if TEST_RUST {
+        ddot(width, &lhs, &rhs)
+    } else {
+        let mut result = 0.0;
+        let mut tmp = 0.0;
+        unsafe {
+            ffi_ddot(
+                c_int(width as i32),
+                lhs.as_ptr(),
+                rhs.as_ptr(),
+                &mut result,
+                Pin::new(&mut tmp),
+            );
+        }
+        result
+    };
+    assert_eq!(result, 10.0);
+}
+            \end{minted}
+            \column{0.5\textwidth}
+            \begin{minted}[escapeinside=||,linenos,firstline=16]{rust}
+include_cpp! {
+    #include "ddot.hpp"
+    safety!(unsafe_ffi)
+    generate!("ddot")
+}
+
+#[test]
+fn test_ddot() {
+    let width = 3;
+    let lhs = vec![1.0, 2.0, 3.0];
+    let rhs = vec![3.0, 2.0, 1.0];
+
+    let result = if TEST_RUST {
+        ddot(width, &lhs, &rhs)
+    } else {
+        let mut result = 0.0;
+        let mut tmp = 0.0;
+        unsafe {
+            ffi_ddot(
+                c_int(width as i32),
+                lhs.as_ptr(),
+                rhs.as_ptr(),
+                &mut result,
+                Pin::new(&mut tmp),
+            );
+        }
+        result
+    };
+    assert_eq!(result, 10.0);
+}
+            \end{minted}
+        \end{columns}
 \end{frame}
 
 
@@ -209,22 +460,97 @@ pub fn parallel_dot_product(
 
 \section{Performance Analysis}
 
-\begin{frame}{Testing plan}
-    % Implement existing tests (strong/weak scaling scripts)
+\begin{frame}{Analysis with \texttt{perf} \ i}
+    \begin{figure}[H]
+        \includegraphics[width=0.85\textwidth]{images/perf_annot_cmp.png}
+        \caption{A screenshot of the \texttt{perf} tool showing hotspots in the C++ (left) and Rust (right) sparse matrix-vector multiplication kernels.}
+        \label{fig:perfAnnotCmp}
+    \end{figure}
 \end{frame}
 
-% \begin{frame}{Perf/Intel vTune analysis}
+\begin{frame}{Analysis with \texttt{perf} \ ii}
+    \begin{figure}[H]
+        \includegraphics[width=0.65\textwidth]{images/perf_annot_labelled.png}
+        \caption{An annotated screenshot of the \texttt{perf} tool showing how ownership checks dominate the proportion of time taken in the Rust implementation, reducing total performance.}
+        \label{fig:perfAnnotLabelled}
+    \end{figure}
+\end{frame}
+
+% \begin{frame}{Analysis with Intel\textsuperscript{\textregistered}\ vTune\texttrademark}
+%     % TODO: Drop this slide
+%     \begin{figure}[H]
+%         \includegraphics[width=0.85\textwidth]{images/intelvtune.png}
+%         \caption{A screenshot of the summary page of Intel\textsuperscript{\textregistered}\ vTune\texttrademark\ when run on the Rust implementation.}
+%         \label{fig:intelvtune}
+%     \end{figure}
 % \end{frame}
 
-% \begin{frame}{Overview of results}
+\begin{frame}{Novel tool \#2: HPC MultiBench}
+    \begin{itemize}
+        \item<1-> Manually spawning many similar jobs with different configurations is tedious!
+        \begin{itemize}
+            \item Time consuming
+            \item Susceptible to human error
+            \item Discourages duplicating results for statistical confidence
+        \end{itemize}
+        \vspace{0.5cm}
+        \item<2-> HPC MultiBench is a Python tool to define, run, and analyse batch compute jobs via Slurm from a convenient YAML format
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Returning to the live demo}
+    By the end of this demo, I will have shown:
+    \begin{enumerate}
+        \item <1-> How a test plan can be defined using a YAML file
+        \item <2-> How runs to exercise a metric over a set of configurations can automatically be created
+        \begin{itemize}
+            \item Remember the beginning of the talk...?
+        \end{itemize}
+        \item <3-> How metrics from completed runs can be aggregated and visualised
+        \item <4-> Documentation for the tool
+    \end{enumerate}
+\end{frame}
+
+
+
+% Serial vs Threading
+% Threading vs mpi vs hybrid
+
+% serial
+% threading
+% mpi
+% hybrid
+ % CPP / Kokkos / Rust
+
+% multinodal (live demo)
+% strong/weak scaling (live demo)
+
+% Summary slide to explicitly answer the question
+
+
+
+% \begin{frame}{Overview of results \ i}
+%     % Strong/weak scaling
 % \end{frame}
 
-% \begin{frame}{Novel tool \#2: HPC MultiBench}
+% \begin{frame}{Overview of results \ ii}
+%     % CPP / Kokkos / Rust
 % \end{frame}
 
-% \begin{frame}{Returning to the live demo}
+% \begin{frame}{Parallelism strategies \ iii}
+%     % All the different versions against each other
 % \end{frame}
 
+\begin{frame}{Roofline Models}
+\end{frame}
+
+\begin{frame}{Applying Roofline Models to HPCCG}
+    \begin{figure}[H]
+        \includegraphics[width=0.65\textwidth]{images/Athena_ERT_generated_roofline.pdf}
+        \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \cite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \cite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
+        \label{fig:intelvtune}
+    \end{figure}
+\end{frame}
 
 
 
@@ -232,21 +558,29 @@ pub fn parallel_dot_product(
 % Can be a little light, but very very required
 
 \begin{frame}{Agile Workflows}
-    % Modified picture of a scrum workflow, show how the meeting process with an agenda set maps in
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.65\textwidth]{images/excalidraw_agile.png}
+        \caption{A diagram of a typical workflow for the Scrum flavour of Agile development.}
+        \label{fig:specification_gantt_chart}
+    \end{figure}
 
-    % Weekly supervisor meetings, which bookend sprints as both a sprint retrospective (discussing work done) and sprint planning (selecting work from the backlog for the next sprint) meeting
-    % Weekly meetings have agenda written beforehand, then minutes written up after and submitted to Tabula
-    % Benefits of agile methodology
-    % - Goal orientation, delivering working software each sprint
-    % - Empowerment to adopt initial plan based on new information and ongoing supervisor discussion
-\end{frame}
+    \only<3->{
+        \begin{tikzpicture}[remember picture,overlay]
+            \node[xshift=-2.5cm,yshift=-1.75cm] at (current page.north east) {\includegraphics[width=0.25\textwidth]{images/github_commit_plot.png}};
+        \end{tikzpicture}
+        \vspace*{-0.75cm}
+    }
 
-\begin{frame}{Development Tooling}
-    % I'm a strong proponent of Git
-    % Two major software products tracked in Git/GitHub
-    % All deliverables in LaTeX tracked in Git/GitHub
-    % Advanced techniques like CI/CD used to enforce code standards
-    % Remote backup policy and way to share files between laptop/DCS
+    \begin{itemize}
+        \item<1-> Weekly supervisor meetings, which bookend sprints
+            \note<1>[item]{Act as both sprint retrospective and planning}
+            \note<1>[item]{Agenda written up beforehand, then minutes submitted to Tabula afterwards}
+        \item<2-> Agile has empowered the project to be goal orientated and flexible to change \cite{beckManifestoAgileSoftware2001}
+            \note<2>[item]{Goal orientation has allowed me to make a number of polished software products}
+            \note<2>[item]{Flexibility to change as allowed be to adapt the initial plan based on new information and ongoing supervisor discussion}
+        \item<3-> Daily work tracked in \texttt{git}
+    \end{itemize}
 \end{frame}
 
 \begin{frame}{Specification Timeline}
@@ -262,7 +596,7 @@ pub fn parallel_dot_product(
     \begin{figure}[h]
         \centering
         \includegraphics[width=\textwidth]{images/actual_gantt_chart.png}
-        \caption{The actual timeline of the project}
+        \caption{The actual timeline of the project. The progress report was more all-encompassing, parallelisation was easier, and clustering was harder than expected}
         \label{fig:actual_gantt_chart}
     \end{figure}
 \end{frame}
@@ -272,12 +606,12 @@ pub fn parallel_dot_product(
 \section{Conclusion}
 
 \begin{frame}{Requirements \ i}
-    \begin{todolist}
+    \begin{enumerate}
         \item[\done\ \ 1.]
           Select a target mini-app from ECP proxy applications or UK-MAC
           (\textbf{Must have})
         \item[\done\ \ 2.]
-          Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990\cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+          Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
           (\textbf{Should have}, \textit{depends on 1})
         \item[\done\ \ 3.]
           Build tooling for running Rust unit tests on C++ code
@@ -292,21 +626,21 @@ pub fn parallel_dot_product(
         \item[\done\ \ 6.]
           Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
           (\textbf{Should have}, \textit{depends on 5})
-    \end{todolist}
+    \end{enumerate}
 \end{frame}
 
 \begin{frame}{Requirements \ ii}
-    \begin{todolist}
+    \begin{enumerate}
         \item[\done\ \ 7.]
           Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
           (\textbf{Must have}, \textit{depends on 5}))
         \item[\done\ \ 8.]
           Equivalence check serial translated code by applying passing C++ unit tests to rust code
           (\textbf{Must have}, \textit{depends on 4, 5})
-        \item[\done\ \ 9.]
+        \item[\wontfix\ \ 9.]
           Equivalence check serial translated code with limited formal verification techniques
           (\textbf{Could have}, \textit{depends on 5})
-        \item[\done\ 10.]
+        \item[\partialdone\ 10.]
           Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
           (\textbf{Could have}, \textit{depends on 5})
         \item[\done\ 11.]
@@ -318,11 +652,11 @@ pub fn parallel_dot_product(
         \item[\done\ 13.]
           Carry out a performance analysis of the serial translated Rust code with the original C++ code
           (\textbf{Must have}, \textit{depends on 5})
-    \end{todolist}
+    \end{enumerate}
 \end{frame}
 
 \begin{frame}{Requirements \ iii}
-    \begin{todolist}
+    \begin{enumerate}
         \item[\done\ 14.]
           Carry out a performance analysis of the parallel translated Rust code with the original C++ code
           (\textbf{Must have}, \textit{depends on 11})
@@ -335,15 +669,15 @@ pub fn parallel_dot_product(
         \item[\done\ 17.]
           Carry out a performance analysis of the clustered translated Rust code with the original C++ code
           (\textbf{Could have}, \textit{depends on 15})
-    \end{todolist}
+    \end{enumerate}
 \end{frame}
 
 \begin{frame}{Evaluation}
     \begin{itemize}
-        \item Achieved all specification points, including stretch goal of assessing clustered compute
+        \item Achieved all \textbf{M}ust/\textbf{S}hould have specification points, including stretch goal of assessing clustered compute
         \item Successfully ``Assessed the Viability of Rust in HPC'', answering the project question
         \vspace{0.5cm}
-        \item \alert{Actively improved} the viability of Rust in HPC, by:
+        \item<2-> \alert{Actively improved} the viability of Rust in HPC, by:
         \begin{itemize}
             \item Developing tools and workflows to assist in translation efforts
             \item Making open source contributions of tests and documentation
@@ -365,7 +699,7 @@ pub fn parallel_dot_product(
             \item \texttt{hpccg-rs} A Rust translation of the HPCCG mini-application
             \item \texttt{hpccg-kokkos} A Kokkos translation of the HPCCG mini-application
             \item \texttt{polyglotest} A mini-framework for pure test-driven development of Rust code translated from C++
-            \item \texttt{HPC MultiBench} A tool to spawn and analyse Slurm jobs for performance benchmarking
+            \item \texttt{HPC\_MultiBench} A tool to spawn and analyse Slurm jobs for performance benchmarking
         \end{itemize}
     \end{itemize}
 \end{frame}
@@ -374,15 +708,16 @@ pub fn parallel_dot_product(
 \begin{itemize}
     \item<1-> Further research points if the project were longer:
     \begin{itemize}
-        \item Translate a second, larger, mini-app such as MiniMD \cite{} or HPCG \cite{}
+        \item Translate a second, larger, mini-app such as MiniMD \cite{osti_1231191} or HPCG \cite{dongarra2015hpcg}
         \item Extend comparisons to include Rust GPU support
+        % Better kokkos comparison
     \end{itemize}
     \vspace{1cm}
-    \item<2-> \alert{Publish novel tools developed} as open source repositories
+    \item<2-> \alert{Publish and maintain novel tools developed} as open source repositories
     \begin{itemize}
         \item<3-> If any of them start getting interest, will respond to pull requests/issues as far as possible
     \end{itemize}
-    \item<4-> \alert{Aim to submit a paper} based on the project to P3HPC \cite{}
+    \item<4-> \alert{Aim to submit a paper} based on the project to P3HPC
 \end{itemize}
 \end{frame}
 
@@ -391,12 +726,20 @@ pub fn parallel_dot_product(
 
 \appendix
 
-\begin{frame}[allowframebreaks]{References}
-  % \nocite{*}
-  \bibliographystyle{IEEEtran}
-  \bibliography{references}
+% \begin{frame}[allowframebreaks]{References}
+%   % \nocite{*}
+%   \bibliographystyle{IEEEtran}
+%   \bibliography{references}
+% \end{frame}
+
+\begin{frame}[allowframebreaks]{Bibliography}
+    \printbibliography[heading=none]
 \end{frame}
 
+\section{Backup Slides}
+
+\begin{frame}{Backup Slides \ i}
+\end{frame}
 
 % \begin{frame}[fragile]{Typography}
 %       \begin{verbatim}The theme provides sensible defaults to
@@ -422,6 +765,17 @@ pub fn parallel_dot_product(
 %     \item \texttt{\textbf{Monospace Bold}}
 %     \item \texttt{\textbf{\textit{Monospace Bold Italic}}}
 %   \end{itemize}
+% \end{frame}
+
+% \begin{frame}{Multiple images on one slide}
+% \begin{figure}
+%     \begin{overprint}
+%     \onslide<1>\includegraphics{./figure1.png}
+%     \onslide<2>\includegraphics{./figure2.png}
+%     \onslide<3>\includegraphics{./figure3.png}
+%     \onslide<4->\includegraphics{./figure4.png}
+%     \end{overprint}
+% \end{figure}
 % \end{frame}
 
 % \begin{frame}{Columns}
