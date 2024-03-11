@@ -6,14 +6,13 @@
 \usepackage{booktabs}
 \usepackage[scale=2]{ccicons}
 
-\usepackage{csquotes}
 \usepackage[normalem]{ulem}
 \usepackage{subcaption}
 \usepackage{tikz}
 \usepackage{minted}
 \usepackage{pgfplots}
 \usepgfplotslibrary{dateplot}
-
+\usepackage{csquotes}
 \usepackage{amssymb}
 \usepackage{pifont}
 \usepackage{xcolor}
@@ -29,8 +28,8 @@
 \usepackage{pgfpages}
 % \setbeamertemplate{note page}{\vspace*{0.75cm}\insertnote}
 % \setbeameroption{show notes on second screen=right}
-\setbeameroption{show notes}
-% \setbeameroption{hide notes}
+% \setbeameroption{show notes}
+\setbeameroption{hide notes}
 
 
 \title{Assessing the Viability of Rust in HPC}
@@ -136,42 +135,41 @@
 \begin{frame}{High-Performance Computing}
     \begin{displayquote}
         \vspace{0.2cm}
-        ``Technology that uses clusters of powerful processors, working in parallel, to process massive multidimensional datasets (big data) and solve complex problems at extremely high speeds.'' -- IBM \cite{WhatHPCIntroduction}
+        ``Technology that uses clusters of powerful processors, working in \textbf{parallel}, to process massive multidimensional datasets (\textbf{big data}) and solve complex problems at \textbf{extremely high speeds}.'' -- IBM \cite{WhatHPCIntroduction}
     \end{displayquote}
-    \vspace*{0.25cm}
-    \begin{itemize}
-        \item Often referred to by the initialism ``HPC''
-        \item Key characteristics from definition:
-        \begin{itemize}
-            \item Parallel computation
-                \note[item]{Within UMA machines with vectorisation and threading}
-                \note[item]{Across NUMA clusters over TCP/IP networks\newline}
-            \item Large data-sets
-            \item \alert{High speeds}
-                \note[item]{Overall goal of HPC is going as fast as possible...}
-        \end{itemize}
-    \end{itemize}
+    % \vspace*{0.25cm}
+    % \begin{itemize}
+    %     \item Often referred to by the initialism ``HPC''
+    %     \item Key characteristics from definition:
+    %     \begin{itemize}
+    %         \item Parallel computation
+    %             \note[item]{Within UMA machines with vectorisation and threading}
+    %             \note[item]{Across NUMA clusters over TCP/IP networks\newline}
+    %         \item Large data-sets
+    %         \item \alert{High speeds}
+    %             \note[item]{Overall goal of HPC is going as fast as possible...}
+    %     \end{itemize}
+    % \end{itemize}
 \end{frame}
 
 \begin{frame}{Mantevo Suite}
     \begin{displayquote}
         \vspace{0.2cm}
-        ``[Mini-apps are] small software programs whose performance characteristics model full-scale applications, yet require only a fraction of the lines of code, making [them] easier to study, design, and rewrite.'' -- Mantevo Suite summary \cite{heroux2013mantevo}.
+        ``[Mini-apps are] \textbf{small} software programs whose \textbf{performance characteristics model full-scale applications}, yet require only \textbf{a fraction of the lines of code}, making [them] easier to study, design, and rewrite.'' -- Mantevo Suite summary \cite{heroux2013mantevo}.
     \end{displayquote}
     \vspace*{0.25cm}
     \begin{itemize}
         \item In the early 2010s, clock speeds had stalled and parallelisation became key
-        \item Physical limitations of hardware design forced hardware/software co-design to meet performance goals
+        \item Physical limitations forced hardware/software co-design to meet performance goals
         \item Pioneered the concept of mini-apps (also called proxy applications):
         \begin{itemize}
-            \item Small codebases for ease of use
-            \item Similar performance characteristics to larger applications
-            \item Facilitate co-design
-                \note[item]{Easy predictors of full application performance, which can be deployed early in hardware development}
-            \item \alert{Can be repurposed to assess software instead of hardware}
+            % \item Small codebases for ease of use
+            % \item Similar performance characteristics to larger applications
+            % \item Facilitate co-design
+            %     \note[item]{Easy predictors of full application performance, which can be deployed early in hardware development}
+            \item Can be re-purposed to assess software instead of hardware
         \end{itemize}
     \end{itemize}
-    
 \end{frame}
 
 \begin{frame}{Warwick's Link to the Mantevo Suite}
@@ -228,24 +226,33 @@
     % https://tex.stackexchange.com/questions/10060/how-to-draw-kiviat-diagrams for C++/Rust
     % Or an iron triangle breakdown
 
-    \textbf{Why might Rust be a good fit for HPC?}
-    \begin{itemize}
-        % \item <2-> Performance
-        \item \alert<2>{Performance}
-            \note[item]{This is something the project assesses!}
-            \note[item]{Rust needs to nearly or as fast as C++ to be viable\newline}
-        \vspace*{1cm}
-        % \item <3-> Productivity
-        \item \alert<3>{Productivity}
-            \note[item]{Ergonomic syntax, most loved language with rich type system etc.}
-            \note[item]{Good, canonical toolchain (\texttt{cargo}, \texttt{rustfmt}, \texttt{clippy}, ...)}
-            \note[item]{Compiler check which make writing bug-free code easier\newline}
-        \vspace*{1cm}
-        % \item <4-> Portability
-        \item \alert<4>{Portability}
-            \note[item]{Rust toolchain is very portable (\texttt{rustc} / \texttt{LLVM} vs \texttt{gcc}, \texttt{icpc}, \texttt{clang}, ...)} % not like c++ with 5+ different proprietary compilers with slightly different flags
-            \note[item]{Still capable of machine-specific optimisations with native architecture flag}
-    \end{itemize}
+    % \begin{itemize}
+    %     % \item <2-> Performance
+    %     \item \alert<2>{Performance}
+    %         \note[item]{This is something the project assesses!}
+    %         \note[item]{Rust needs to nearly or as fast as C++ to be viable\newline}
+    %     \vspace*{1cm}
+    %     % \item <3-> Productivity
+    %     \item \alert<3>{Productivity}
+    %         \note[item]{Ergonomic syntax, most loved language with rich type system etc.}
+    %         \note[item]{Good, canonical toolchain (\texttt{cargo}, \texttt{rustfmt}, \texttt{clippy}, ...)}
+    %         \note[item]{Compiler check which make writing bug-free code easier\newline}
+    %     \vspace*{1cm}
+    %     % \item <4-> Portability
+    %     \item \alert<4>{Portability}
+    %         \note[item]{Rust toolchain is very portable (\texttt{rustc} / \texttt{LLVM} vs \texttt{gcc}, \texttt{icpc}, \texttt{clang}, ...)} % not like c++ with 5+ different proprietary compilers with slightly different flags
+    %         \note[item]{Still capable of machine-specific optimisations with native architecture flag}
+    % \end{itemize}
+    
+    \begin{figure}[H]
+        \includegraphics[width=0.5\textwidth]{images/excalidraw_p3_triangle.png}
+        \vspace*{0.75cm}
+        \label{fig:warwick_mantevo_link}
+        % \caption{A diagram of three important aspects of high-performance software.}
+    \end{figure}
+
+    
+    % \textbf{Why might Rust be a good fit for HPC?}
 \end{frame}
 
 
@@ -264,14 +271,13 @@
         \centering
         \column{0.5\textwidth}
             \begin{itemize}
-                \item There are more valid C++ programs than (safe) Rust programs!
+                \item There are more valid C++ programs\newline than (safe) Rust programs!
                     \note[item]{In a similar sense to moving from un-typed to type lambda calculi}
                     \note[item]{Could be considered an extension to Barendregt’s Lambda cube}
                 \item Rust explicitly prohibits undefined behaviour by default
                 \begin{itemize}
-                    \item This is normally a good thing
+                    \item This is normally a good thing!
                 \end{itemize}
-                \vspace*{0.5cm}
                 \item Translation is less trivial
                 \begin{itemize}
                     \item Direct mapping might not exist
@@ -302,43 +308,202 @@
     \begin{itemize}
         \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
-            \item The borrow checker provides strong guarantees against race conditions/undefined behaviour during parallel execution
+            \item Many concurrency bugs moved from runtime to compile-time
+                \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
+                \note[item]{Non thread-safe code often doesn't even compile, reducing the need to debug flaky race conditions}
+            \item Ubiquitous crates provide very high-level abstractions
         \end{itemize}
-        \vspace*{0.5cm}
-        % TODO: Could compare to PThreads as well?
-        \item<2-> The \texttt{rayon} crate provides an even higher-level abstraction for parallelism than \texttt{OpenMP}, with stronger correctness guarantees
-        \begin{columns}[T,onlytextwidth]
-            \centering
-            \column{0.5\textwidth}
-                \begin{minted}[escapeinside=||,linenos]{rust}
+    \end{itemize}    
+    \vspace*{0.15cm}
+
+    \begin{figure}
+        \begin{subfigure}[c]{.55\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{c++}
+double dot_product (
+    int n, double* x, double* y
+) {
+    double result = 0.0;
+    for (int i = 0; i < n; i++) {
+        result += x[i] * y[i];
+    }
+    return result;
+}
+            \end{minted}
+            \label{fig:cpp-ddot-serial}
+            \caption{C++ parallel implementation}
+        \end{subfigure}%
+        \begin{subfigure}[c]{.45\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn dot_product(
-    lhs: &[f64], rhs: &[f64]
+lhs: &[f64], rhs: &[f64]
 ) -> f64 {
-    lhs.iter()
-        .zip(rhs.iter())
-        .map(|(x, y)| x * y)
-        .sum()
+lhs.iter()
+    .zip(rhs.iter())
+    .map(|(x, y)| x * y)
+    .sum()
 }
-                \end{minted}
-            % TOOD: Box around change
-            \column{0.5\textwidth}
-                \begin{minted}[escapeinside=||,linenos]{rust}
-pub fn parallel_dot_product(
-    lhs: &[f64], rhs: &[f64]
-) -> f64 {
-    lhs.par_iter()
-        .zip(rhs.par_iter())
-        .map(|(x, y)| x * y)
-        .sum()
-}
-                \end{minted}
-            \begin{tikzpicture}[remember picture,overlay]
-                \draw[red, very thick] (1.3,2.85) rectangle (3.4,2.4);
-                \draw[red, very thick] (2.95,1.95) rectangle (5.05,2.35);
-            \end{tikzpicture}
-        \end{columns}
-    \end{itemize}
+            \end{minted}
+            \label{fig:rust-ddot-serial}
+            \vspace*{0.5cm}
+            \caption{Rust serial implementation}
+        \end{subfigure}
+    \end{figure}
 \end{frame}
+
+\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+    \begin{itemize}
+        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \begin{itemize}
+            \item Many concurrency bugs moved from runtime to compile-time
+                \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
+                \note[item]{Non thread-safe code often doesn't even compile, reducing the need to debug flaky race conditions}
+            \item Ubiquitous crates provide very high-level abstractions
+        \end{itemize}
+    \end{itemize}    
+    \vspace*{0.15cm}
+
+    \begin{figure}
+        \begin{subfigure}[c]{.55\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{c++}
+double dot_product (
+    int n, double* x, double* y
+) {
+    double result = 0.0;
+    #pragma omp parallel for
+    for (int i = 0; i < n; i++) {
+        result += x[i] * y[i];
+    }
+    return result;
+}
+            \end{minted}
+            \label{fig:cpp-ddot-openmp-race}
+            \caption{C++ parallel implementation}
+            \only<2> {
+                \begin{tikzpicture}[remember picture,overlay]
+                    \draw[red, very thick] (-2.4,3.1) rectangle node[below, xshift=3cm, yshift=-0.3cm] {Data race!} (-0.4,2.5);
+                \end{tikzpicture}
+            }
+        \end{subfigure}%
+        \begin{subfigure}[c]{.45\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{rust}
+pub fn dot_product(
+lhs: &[f64], rhs: &[f64]
+) -> f64 {
+lhs.iter()
+    .zip(rhs.iter())
+    .map(|(x, y)| x * y)
+    .sum()
+}
+            \end{minted}
+            \label{fig:rust-ddot-serial-2}
+            \vspace*{0.5cm}
+            \caption{Rust serial implementation}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+    \begin{itemize}
+        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \begin{itemize}
+            \item Many concurrency bugs moved from runtime to compile-time
+                \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
+                \note[item]{Non thread-safe code often doesn't even compile, reducing the need to debug flaky race conditions}
+            \item Ubiquitous crates provide very high-level abstractions
+        \end{itemize}
+    \end{itemize}    
+    \vspace*{0.15cm}
+
+    \begin{figure}
+        \begin{subfigure}[c]{.55\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos,breaklines]{c++}
+double dot_product (
+    int n, double* x, double* y
+) {
+    double result = 0.0;
+#pragma omp parallel for reduction(+:result)
+    for (int i = 0; i < n; i++) {
+        result += x[i] * y[i];
+    }
+    return result;
+}
+            \end{minted}
+            \label{fig:cpp-ddot-openmp-reduction}
+            \vspace*{-0.5cm}
+            \caption{C++ fixed parallel implementation}
+        \end{subfigure}%
+        \begin{subfigure}[c]{.45\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{rust}
+pub fn dot_product(
+lhs: &[f64], rhs: &[f64]
+) -> f64 {
+lhs.iter()
+    .zip(rhs.iter())
+    .map(|(x, y)| x * y)
+    .sum()
+}
+            \end{minted}
+            \label{fig:rust-ddot-serial-3}
+            \vspace*{1.15cm}
+            \caption{Rust serial implementation}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+    \begin{itemize}
+        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \begin{itemize}
+            \item Many concurrency bugs moved from runtime to compile-time
+                \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
+                \note[item]{Non thread-safe code often doesn't even compile, reducing the need to debug flaky race conditions}
+            \item Ubiquitous crates provide very high-level abstractions
+        \end{itemize}
+    \end{itemize}    
+    \vspace*{0.15cm}
+
+    \begin{figure}
+        \begin{subfigure}[c]{.55\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos,breaklines]{c++}
+double dot_product (
+    int n, double* x, double* y
+) {
+    double result = 0.0;
+#pragma omp parallel for reduction(+:result)
+    for (int i = 0; i < n; i++) {
+        result += x[i] * y[i];
+    }
+    return result;
+}
+            \end{minted}
+            \label{fig:cpp-ddot-openmp-reduction-2}
+            \vspace*{-0.5cm}
+            \caption{C++ fixed parallel implementation}
+        \end{subfigure}%
+        \begin{subfigure}[c]{.45\textwidth}\centering
+            \begin{minted}[escapeinside=||,linenos]{rust}
+use rayon::prelude::*; 
+
+pub fn dot_product(
+lhs: &[f64], rhs: &[f64]
+) -> f64 {
+lhs.par_iter()
+    .zip(rhs.par_iter())
+    .map(|(x, y)| x * y)
+    .sum()
+}
+            \end{minted}
+            \label{fig:rust-ddot-rayon}
+            \caption{Rust Rayon implementation}
+            \begin{tikzpicture}[remember picture,overlay]
+                \draw[red, very thick] (-1,3.1) rectangle (1.5,2.5);
+                \draw[red, very thick] (-2.5,3.75) rectangle (0,3.15);
+            \end{tikzpicture}
+        \end{subfigure}
+    \end{figure}
+\end{frame}
+
+
 
 \begin{frame}{Clustered Computing in Rust}
     \begin{itemize}
@@ -368,7 +533,7 @@ pub fn parallel_dot_product(
 \begin{frame}{Equivalence Checking Techniques}
     % TODO: Re-work this slide
     \begin{itemize}
-        \item Equivalence checking is critical to ensure performance comparisons are fair
+        \item Equivalence checking is critical to keep performance comparisons fair
         \item Four different techniques considered
         \begin{enumerate}
             \item<1-> \alert<5>{End-to-end testing}
@@ -412,33 +577,33 @@ pub fn parallel_dot_product(
 \begin{frame}{Novel tool \#1: Polyglotest \ i}
     % TODO: Re-work this slide
     \begin{overprint}
-        \onslide<1-5>
+        \onslide<1-3>
             \begin{alertblock}{Key Insight}
                 \vspace*{0.25cm}
                 Running existing unit tests from the original implementation on the translated one gives strong guarantees of equivalence.
             \end{alertblock}
             \vspace*{1cm}
             \begin{itemize}
-                \item<2-> Write/use existing unit tests for the original C++ code to drive translated Rust code
+                \item Write/use existing unit tests for the original C++ code to drive translated Rust code
+                \item How do we do this?
                 \begin{itemize}
-                    \item<3-> How?
-                    \item<4-> Use a ``foreign function interface'' bridge like \texttt{cxx}
+                    \item<2-> Use a ``foreign function interface'' bridge like \texttt{cxx}
                 \end{itemize}
-                \item<5-> \textit{But our software output is in Rust, shouldn't we be getting rid of C++ unit tests?}
+                \item<3-> \textit{But our software output is in Rust, shouldn't we be getting rid of C++ unit tests?}
             \end{itemize}
-        \onslide<6->
+        \onslide<4->
             \begin{alertblock}{Key Insight}
                 \vspace*{0.25cm}
-                Running existing unit tests from the \sout{original} \textit{translated} implementation on the \sout{translated} \textit{original} one gives strong guarantees of equivalence.
+                Running unit tests from the \sout{original} \textit{translated} implementation on the \sout{translated} \textit{original} one gives strong guarantees of equivalence.
             \end{alertblock}
             \vspace*{1cm}
             \begin{itemize}
-                \item<7-> Write unit tests for the \textit{translated Rust} code to drive \textit{original C++} code
+                \item Write unit tests for the \textit{translated Rust} code to drive \textit{original C++} code
                 \begin{itemize}
-                    \item Use a ``foreign function interface'' bridge like \texttt{autocxx}
+                    \item Again, use a ``foreign function interface'' bridge like \texttt{autocxx}
                 \end{itemize}
                 \vspace*{0.5cm}
-                \item<8-> \alert{We can now do \textbf{pure} Test-Driven Development to translate our Rust code!}
+                \item<5-> \alert{We can now do \textbf{pure} Test-Driven Development to translate our Rust code!}
             \end{itemize}
     \end{overprint}
 
@@ -523,8 +688,12 @@ fn test_ddot() {
 \begin{frame}{Performance Analysis Techniques}
     % TODO: Re-work this slide
     \begin{itemize}
-        \item Performance profilers
-        \item Direct comparison
+        \item Near-peer performance is key for Rust to be viable
+        \item Two different ways of assessing performance
+        \begin{enumerate}
+            \item Performance profilers
+            \item Direct comparison
+        \end{enumerate}
     \end{itemize}
 \end{frame}
 
@@ -578,8 +747,8 @@ fn test_ddot() {
         % TODO: Get documentation working!
         % \item <4-> Documentation for the tool
     \end{enumerate}
-    \vspace*{0.5cm)}
-    \alert{It will also show all the directly measure results for comparing C++ and Rust performance}
+    \vspace*{0.5cm}
+    \alert{It will also show all the directly measured results for comparing C++ and Rust performance}
 \end{frame}
 
 
@@ -612,10 +781,11 @@ fn test_ddot() {
 % \end{frame}
 
 
-\begin{frame}{Roofline Models}
-\end{frame}
+% \begin{frame}{Roofline Models}
+% \end{frame}
 
 \begin{frame}{Applying Roofline Models to HPCCG}
+    % Add `lscpu` for my machine alongside it
     \begin{figure}[H]
         \includegraphics[width=0.65\textwidth]{images/Athena_ERT_generated_roofline.pdf}
         \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \cite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \cite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
@@ -647,6 +817,9 @@ fn test_ddot() {
     \only<2->{
         \begin{tikzpicture}[remember picture,overlay]
             \node[xshift=-2.5cm,yshift=-1.75cm] at (current page.north east) {\includegraphics[width=0.25\textwidth]{images/github_commit_plot.png}};
+        \end{tikzpicture}
+        \begin{tikzpicture}[remember picture,overlay]
+            \node[xshift=-1cm,yshift=-2.65cm] at (current page.north east) {\includegraphics[width=0.115\textwidth]{images/github_streak.png}};
         \end{tikzpicture}
         \vspace*{-0.75cm}
     }
