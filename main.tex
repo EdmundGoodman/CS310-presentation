@@ -22,18 +22,20 @@
 \newcommand{\wontfix}{\rlap{$\square$}{\large\hspace{1pt}\textcolor{red}{\xmark}}}
 \newcommand{\partialdone}{\rlap{$\square$}{\raisebox{2pt}{\large\hspace{1pt}\textcolor{orange}{\cmark}}}\hspace{-2.5pt}}
 
-\usepackage[backend=biber,style=numeric, citestyle=ieee]{biblatex}
-\addbibresource{references.bib}
+% \usepackage[backend=biber, style=numeric, citestyle=ieee]{biblatex}
+\usepackage[backend=biber, citestyle=authortitle, maxbibnames=99]{biblatex}
+\renewcommand{\footnotesize}{\fontsize{6pt}{6pt}\selectfont}
+\addbibresource{references_local.bib}
 
 \usepackage{pgfpages}
 % \setbeamertemplate{note page}{\vspace*{0.75cm}\insertnote}
 % \setbeameroption{show notes on second screen=right}
-% \setbeameroption{show notes}
-\setbeameroption{hide notes}
+\setbeameroption{show notes}
+% \setbeameroption{hide notes}
 
 
 \title{Assessing the Viability of Rust in HPC}
-\subtitle{3rd year project presentation}
+\subtitle{3\textsuperscript{rd} year project presentation}
 \author{Edmund Goodman}
 \date{\today}
 
@@ -44,7 +46,6 @@
 
 \maketitle
     \note[itemize]{
-        \item Explain project is not just assessing Rust in HPC, but also thinking about workflows and pragmatic viability\
         \item Agenda will be:
         \begin{enumerate}
             \item Project background
@@ -84,7 +85,7 @@
     \begin{itemize}
         \item Originally developed by Mozilla, and released in 2010
             \note[item]{Relatively young language, 14 years to C++'s 45\newline}
-        \item Its website claims \cite{RustProgrammingLanguage} it is:
+        \item Its website claims \footcite{RustProgrammingLanguage} it is:
         \begin{itemize}
             \item Performant
                 \note[item]{No garbarge collection needed}
@@ -100,10 +101,11 @@
             \note[item]{Specifically, its ownership model which works by counting mutable and immutable references to data}
         \begin{itemize}
             \item Encompasses memory and thread safety
-            \item Over 70\% of security bugs in the Chromium project related to memory safety \cite{MemorySafety} % serious security bugs
+            \item Over 70\% of security bugs in the Chromium project related to memory safety \footcite{MemorySafety} % serious security bugs
         \end{itemize}
         \vspace*{0.25cm}
-        \item Voted ``most loved'' programming language in StackOverflow's developer survey \cite{StackOverflowDeveloper}
+        \item Voted ``most loved'' programming language in StackOverflow's developer survey \footcite{StackOverflowDeveloper}
+        \vspace*{0.25cm}
     \end{itemize}
 \end{frame}
 
@@ -113,9 +115,9 @@
     % \end{tikzpicture}
     Has been in the news even in the last month due to:
     \begin{itemize}
-        \item White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'' \cite{PressReleaseFuture2024}  % (February 26th)
+        \item White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'' \footcite{PressReleaseFuture2024}  % (February 26th)
             \note[item]{Explicitly mentioning moving critical codebases to Rust as a part of US national cyber security policy}
-        \item Google pledging \$1 million to improve Rust/C++ interoperability \cite{ImprovingInteroperabilityRust}  % (February 5th)
+        \item Google pledging \$1 million to improve Rust/C++ interoperability \footcite{ImprovingInteroperabilityRust}  % (February 5th)
         \begin{itemize}
             \item<2-> \alert{Blog post mentions tooling such as \texttt{autocxx} as part of this effort}
                 \note[item]{\texttt{autocxx}, is a tool to which I had already pull requested integration tests in the course of the project}
@@ -135,7 +137,7 @@
 \begin{frame}{High-Performance Computing}
     \begin{displayquote}
         \vspace{0.2cm}
-        ``Technology that uses clusters of powerful processors, working in \textbf{parallel}, to process massive multidimensional datasets (\textbf{big data}) and solve complex problems at \textbf{extremely high speeds}.'' -- IBM \cite{WhatHPCIntroduction}
+        ``Technology that uses clusters of powerful processors, working in \textbf{parallel}, to process massive multidimensional datasets (\textbf{big data}) and solve complex problems at \textbf{extremely high speeds}.'' -- IBM \footcite{WhatHPCIntroduction}
     \end{displayquote}
     % \vspace*{0.25cm}
     % \begin{itemize}
@@ -167,14 +169,14 @@
     \vspace*{0.75cm}
     \begin{displayquote}
         \vspace{0.2cm}
-        ``[Mini-apps are] \textbf{small} software programs whose \textbf{performance characteristics model full-scale applications}, yet require only \textbf{a fraction of the lines of code}, making [them] easier to study, design, and rewrite.'' -- Mantevo Suite summary \cite{heroux2013mantevo}.
+        ``[Mini-apps are] \textbf{small} software programs whose \textbf{performance characteristics model full-scale applications}, yet require only \textbf{a fraction of the lines of code}, making [them] easier to study, design, and rewrite.'' -- Mantevo Suite summary \footcite{heroux2013mantevo}.
     \end{displayquote}
 \end{frame}
 
 \begin{frame}{Warwick's Link to the Mantevo Suite}
     \begin{figure}[H]
         \includegraphics[width=0.35\textwidth]{images/warwick_mantevo_link.png}
-        \caption{A screenshot of an appendix to the original Mantevo Suite paper, showing Stephen Jarvis' support for the project \cite{heroux2013mantevo}.}
+        \caption{A screenshot of an appendix to the original Mantevo Suite paper, showing Stephen Jarvis' support for the project \footcite{heroux2013mantevo}.}
         \label{fig:warwick_mantevo_link}
     \end{figure}
         \note[item]{Perhaps this helps justify mini-apps as an interesting thing to think about?}
@@ -184,10 +186,10 @@
     \begin{columns}[onlytextwidth]
         \column{0.5\textwidth}
             \begin{itemize}
-                \item ``The original Mantevo mini-app'' \cite{MantevoHPCCG2023}
+                \item ``The original Mantevo mini-app'' \footcite{MantevoHPCCG2023}
                 \vspace{0.5cm}
-                \item Designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{heroux2013mantevo}
-                \item Based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952 \cite{hestenesMethodsConjugateGradients1952}
+                \item Designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.''
+                \item Based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952 \footcite{hestenesMethodsConjugateGradients1952}
                 \item Small C++ codebase with dependent only on \texttt{OpenMP} and \texttt{MPI}
             \end{itemize}
         \column{0.5\textwidth}
@@ -266,7 +268,7 @@
           Select a target mini-app from ECP proxy applications or UK-MAC
           (\textbf{Must have})
         \item[\done\ \ 2.]
-          Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+          Fuzz test the possible mini-apps for memory safety issues using static analysis tooling \footcite{stepanovMemorySanitizerFastDetector2015}
           (\textbf{Should have}, \textit{depends on 1})
     \end{itemize}
 \end{frame}
@@ -573,7 +575,7 @@ world.all_reduce_into(
           Write direct translation of serial version mini-app from C++ to Rust
           (\textbf{Must have}, \textit{depends on 1})
         \item[\done\ \ 6.]
-          Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
+          Modify serial version of translated code to be idiomatic Rust \footcite{endlerMreIdiomaticrust2023} 
           (\textbf{Should have}, \textit{depends on 5})
         \item[\done\ 11.]
           Modify the serial translated code to allow parallel execution
@@ -604,7 +606,7 @@ world.all_reduce_into(
             % \end{itemize}
             \item Formal methods
             % \begin{itemize}
-            %     \item Techniques such as Hoare Logic \cite{hoareAxiomaticBasisComputer1969} allow formal reasoning about programs
+            %     \item Techniques such as Hoare Logic \footcite{hoareAxiomaticBasisComputer1969} allow formal reasoning about programs
             % \end{itemize}
             \item LLVM analysis
             % \begin{itemize}
@@ -629,10 +631,15 @@ world.all_reduce_into(
     \begin{figure}[H]
         \hspace*{-1cm}
         \includegraphics[width=0.45\textwidth]{images/excalidraw_tdd.png}
-        \caption{A diagram showing the top-level workflow of the Test-Driven Development methodology.}
+        \caption{A diagram showing the top-level workflow of the Test-Driven Development\footcite{beckTestDrivenDevelopment2022} methodology.}
         \label{fig:tdd_workflow}
     \end{figure}
-    \only<2>{\centering\large\alert{What if we could leverage this during translation...?}}
+    \only<2>{
+        \vspace*{-0.5cm}
+        \centering\large\alert{What if we could leverage this during translation...?}
+        \vspace*{-0.4cm}
+    }
+    \vspace*{1cm}
 \end{frame}
 
 % \begin{frame}{Novel tool \#1: Polyglotest \ i}
@@ -901,7 +908,7 @@ fn test_ddot() {
 %     % Add `lscpu` for my machine alongside it
 %     \begin{figure}[H]
 %         \includegraphics[width=0.65\textwidth]{images/Athena_ERT_generated_roofline.pdf}
-%         \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \cite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \cite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
+%         \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \footcite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \footcite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
 %         \label{fig:intelvtune}
 %     \end{figure}
 % \end{frame}
@@ -941,7 +948,7 @@ fn test_ddot() {
 \begin{frame}{Agile Workflows}
     \begin{figure}[h]
         \centering
-        \includegraphics[width=0.65\textwidth]{images/excalidraw_agile.png}
+        \includegraphics[width=0.6\textwidth]{images/excalidraw_agile.png}
         \caption{A diagram of a typical workflow for the Scrum flavour of Agile development.}
         \label{fig:specification_gantt_chart}
     \end{figure}
@@ -956,16 +963,18 @@ fn test_ddot() {
         \vspace*{-0.75cm}
     }
 
+    \vspace*{-0.5cm}
     \begin{itemize}
         \item Weekly supervisor meetings, which bookend sprints
             \note[item]{Act as both sprint retrospective and planning}
             \note[item]{Agenda written up beforehand, then minutes submitted to Tabula afterwards\newline}
-        \item Agile has empowered the project to be goal orientated and flexible to change \cite{beckManifestoAgileSoftware2001}
+        \item Agile has empowered the project to be goal orientated and flexible to change \footcite{beckManifestoAgileSoftware2001}
             \note[item]{Goal orientation has allowed me to make a number of polished software products}
             \note[item]{Flexibility to change as allowed be to adapt the initial plan based on new information and ongoing supervisor discussion\newline}
         \item Daily work tracked in \texttt{git}
             \note[item]{By daily - I really mean daily! Continuous streak of $\geq 1$ commit every day this year}
     \end{itemize}
+    \vspace*{0.5cm}
 \end{frame}
 
 \begin{frame}{Specification Timeline}
@@ -1000,7 +1009,7 @@ fn test_ddot() {
 %           Select a target mini-app from ECP proxy applications or UK-MAC
 %           (\textbf{Must have})
 %         \item[\done\ \ 2.]
-%           Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+%           Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \footcite{millerEmpiricalStudyReliability1990}\footcite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \footcite{stepanovMemorySanitizerFastDetector2015}
 %           (\textbf{Should have}, \textit{depends on 1})
 %         \item[\done\ \ 3.]
 %           Build tooling for running Rust unit tests on C++ code
@@ -1013,7 +1022,7 @@ fn test_ddot() {
 %           Write direct translation of serial version mini-app from C++ to Rust
 %           (\textbf{Must have}, \textit{depends on 1})
 %         \item[\done\ \ 6.]
-%           Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
+%           Modify serial version of translated code to be idiomatic Rust \footcite{endlerMreIdiomaticrust2023} 
 %           (\textbf{Should have}, \textit{depends on 5})
 %     \end{itemize}
 % \end{frame}
@@ -1098,7 +1107,7 @@ fn test_ddot() {
 \begin{itemize}
     \item<1-> Further research points if the project were longer:
     \begin{itemize}
-        \item Translate a second, larger, mini-app such as MiniMD \cite{osti_1231191} or HPCG \cite{dongarra2015hpcg}
+        \item Translate a second, larger, mini-app such as MiniMD \footcite{osti_1231191} or HPCG \footcite{dongarra2015hpcg}
         \item Extend comparisons to include Rust GPU support
         % Better kokkos comparison
     \end{itemize}
