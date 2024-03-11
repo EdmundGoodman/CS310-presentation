@@ -153,23 +153,22 @@
 \end{frame}
 
 \begin{frame}{Mantevo Suite}
+    \begin{itemize}
+        \item In the early 2010s, hardware limitations forced hardware/software co-design
+        \item Pioneered the concept of mini-apps to facilitate this
+        % \begin{itemize}
+        %     % \item Small codebases for ease of use
+        %     % \item Similar performance characteristics to larger applications
+        %     % \item Facilitate co-design
+        %     %     \note[item]{Easy predictors of full application performance, which can be deployed early in hardware development}
+        %     \item Can be re-purposed to assess software instead of hardware
+        % \end{itemize}
+    \end{itemize}
+    \vspace*{0.75cm}
     \begin{displayquote}
         \vspace{0.2cm}
         ``[Mini-apps are] \textbf{small} software programs whose \textbf{performance characteristics model full-scale applications}, yet require only \textbf{a fraction of the lines of code}, making [them] easier to study, design, and rewrite.'' -- Mantevo Suite summary \cite{heroux2013mantevo}.
     \end{displayquote}
-    \vspace*{0.25cm}
-    \begin{itemize}
-        \item In the early 2010s, clock speeds had stalled and parallelisation became key
-        \item Physical limitations forced hardware/software co-design to meet performance goals
-        \item Pioneered the concept of mini-apps (also called proxy applications):
-        \begin{itemize}
-            % \item Small codebases for ease of use
-            % \item Similar performance characteristics to larger applications
-            % \item Facilitate co-design
-            %     \note[item]{Easy predictors of full application performance, which can be deployed early in hardware development}
-            \item Can be re-purposed to assess software instead of hardware
-        \end{itemize}
-    \end{itemize}
 \end{frame}
 
 \begin{frame}{Warwick's Link to the Mantevo Suite}
@@ -189,7 +188,7 @@
                 \vspace{0.5cm}
                 \item Designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.'' \cite{heroux2013mantevo}
                 \item Based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952 \cite{hestenesMethodsConjugateGradients1952}
-                \item A small C++ codebase with dependent only on \texttt{OpenMP} and \texttt{MPI}
+                \item Small C++ codebase with dependent only on \texttt{OpenMP} and \texttt{MPI}
             \end{itemize}
         \column{0.5\textwidth}
             \begin{figure}[H]
@@ -250,11 +249,8 @@
         \label{fig:warwick_mantevo_link}
         % \caption{A diagram of three important aspects of high-performance software.}
     \end{figure}
-
-    
     % \textbf{Why might Rust be a good fit for HPC?}
 \end{frame}
-
 
 % \begin{frame}{Existing work}
 %     \begin{itemize}
@@ -263,6 +259,23 @@
 %         \item \alert{Aim to provide a holistic view of Rust's viability for HPC}
 %     \end{itemize}
 % \end{frame}
+
+\begin{frame}{Project Initiation Requirements}
+    \begin{itemize}
+        \item[\done\ \ 1.]
+          Select a target mini-app from ECP proxy applications or UK-MAC
+          (\textbf{Must have})
+        \item[\done\ \ 2.]
+          Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+          (\textbf{Should have}, \textit{depends on 1})
+    \end{itemize}
+\end{frame}
+    
+
+
+
+
+
 
 \section{Translation Process}
 
@@ -306,7 +319,7 @@
 
 \begin{frame}[fragile]{Fearless Parallelism in Rust}
     \begin{itemize}
-        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
                 \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
@@ -352,7 +365,7 @@ lhs.iter()
 
 \begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
     \begin{itemize}
-        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
                 \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
@@ -380,7 +393,7 @@ double dot_product (
             \caption{C++ parallel implementation}
             \only<2> {
                 \begin{tikzpicture}[remember picture,overlay]
-                    \draw[red, very thick] (-2.4,3.1) rectangle node[below, xshift=3cm, yshift=-0.3cm] {Data race!} (-0.4,2.5);
+                    \draw[red, very thick] (-2.4,3.1) rectangle node[below, xshift=2.8cm, yshift=-0.3cm] {\huge{Data race!}} (-0.5,2.65);
                 \end{tikzpicture}
             }
         \end{subfigure}%
@@ -404,7 +417,7 @@ lhs.iter()
 
 \begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
     \begin{itemize}
-        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
                 \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
@@ -452,7 +465,7 @@ lhs.iter()
 
 \begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
     \begin{itemize}
-        \item<1-> One of Rust's key selling points is ``Fearless Parallelism''
+        \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
                 \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
@@ -495,35 +508,82 @@ lhs.par_iter()
             \end{minted}
             \label{fig:rust-ddot-rayon}
             \caption{Rust Rayon implementation}
-            \begin{tikzpicture}[remember picture,overlay]
-                \draw[red, very thick] (-1,3.1) rectangle (1.5,2.5);
-                \draw[red, very thick] (-2.5,3.75) rectangle (0,3.15);
-            \end{tikzpicture}
+            \only<2> {
+                \begin{tikzpicture}[remember picture,overlay]
+                    \draw[red, very thick] (-0.9,3.1) rectangle (1.1,2.65);
+                    \draw[red, very thick] (-2.6,3.6) rectangle (-0.5,3.15);
+                    % \draw[red, very thick] (-2.5,3.75) rectangle (0,3.15);
+                \end{tikzpicture}
+            }
         \end{subfigure}
     \end{figure}
 \end{frame}
 
 
 
-\begin{frame}{Clustered Computing in Rust}
+\begin{frame}[fragile]{Clustered Computing in Rust}
     \begin{itemize}
         \item The Message Passing Interface (\texttt{MPI}) is a common way to distribute work across machines in a HPC computer cluster
         \item \texttt{MPI} has native C++ and FORTRAN implementations of its standard specification
         \item The \texttt{mpi} crate provides bindings from Rust into the C++ implementation
-        \begin{itemize}
-            \item These bindings are designed to be ``rustic''
-            \item They (so far\footnote{I am looking at pull requesting simple examples based on the integration tests}) have quite poor documentation
-        \end{itemize}
+        % \begin{itemize}
+        %     \item These bindings are designed to be ``rustic''
+        %     \item They (so far\footnote{I am looking at pull requesting simple examples based on the integration tests}) have quite poor documentation
+        % \end{itemize}
         % MPI spec
-        % TODO: Could add code example?
     \end{itemize}
+    \vspace*{0.1cm}
+    \begin{figure}
+        \begin{subfigure}[c]{.5\textwidth}\centering
+            \begin{minted}[linenos,breaklines]{c++}
+#include <mpi.h>
+MPI_Init(&argc, &argv);
+
+MPI_Allreduce(
+    &local_result, &global_result,
+    1, MPI_DOUBLE, MPI_SUM,
+    MPI_COMM_WORLD
+);
+            \end{minted}
+            \label{fig:cpp-mpi}
+            \vspace*{0.15cm}
+            \caption{C++ MPI example}
+        \end{subfigure}%
+        \begin{subfigure}[c]{.5\textwidth}\centering
+            \begin{minted}[linenos]{rust}
+use mpi::collective::SystemOperation;
+use mpi::traits::*;
+let universe = mpi::initialize().unwrap();
+let world = universe.world();
+
+world.all_reduce_into(
+    &local_result, &mut global_result,
+    SystemOperation::sum()
+);
+            \end{minted}
+            \label{fig:rust-mpi}
+            \caption{Rust MPI example}
+        \end{subfigure}
+    \end{figure}
 \end{frame}
 
-% \begin{frame}{Translation Workflow}
-%     % TODO: Is this slide needed?
-%     % Diagram of loop from translate -> equivalence check -> characterise performance
-%     % Ease of these three steps constitute criteria for viability of moving from C++ to Rust in HPC
-% \end{frame}
+\begin{frame}{Translation Requirements}
+    \begin{itemize}
+        \item[\done\ \ 5.]
+          Write direct translation of serial version mini-app from C++ to Rust
+          (\textbf{Must have}, \textit{depends on 1})
+        \item[\done\ \ 6.]
+          Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
+          (\textbf{Should have}, \textit{depends on 5})
+        \item[\done\ 11.]
+          Modify the serial translated code to allow parallel execution
+          (\textbf{Must have}, \textit{depends on 5})
+        \item[\done\ 15.]
+          Modify the parallel translated code to allow execution across clustered compute resources
+          (\textbf{Could have}, \textit{depends on 11})
+    \end{itemize}
+    % TODO: Add lines of code written count here...
+\end{frame}
 
 
 
@@ -531,30 +591,31 @@ lhs.par_iter()
 \section{Equivalence Checking}
 
 \begin{frame}{Equivalence Checking Techniques}
-    % TODO: Re-work this slide
+    % TODO: Add diagram showing rigour vs approach/ease for each methodology?
     \begin{itemize}
-        \item Equivalence checking is critical to keep performance comparisons fair
+        \item Equivalence checking is critical to make performance comparisons fair
+        \vspace*{0.5cm}
         \item Four different techniques considered
         \begin{enumerate}
-            \item<1-> \alert<5>{End-to-end testing}
-            \begin{itemize}
-                \item Run the program and examine its output
-                \item Fairly effective for chaotic systems (like HPCCG), but can miss edge-cases in complex logic % Elucidated weird bug in both versions given non-associativity of floating point operations
-            \end{itemize}
-            \item<2-> Formal methods
-            \begin{itemize}
-                \item Techniques such as Hoare Logic \cite{hoareAxiomaticBasisComputer1969} allow formal reasoning about programs
-            \end{itemize}
-            \item<3-> LLVM analysis
-            \begin{itemize}
-                \item Since the translated code does the same thing, generated LLVM IR may look similar
-            \end{itemize}
-            \item<4-> \alert<5>{Unit testing}
-            \begin{itemize}
-                \item Drive small code units and examine their outputs
-                \item Can provide confidence about these units \textit{individually}
-                \item Requires manual duplication across both languages, if no tooling exists...
-            \end{itemize}
+            \item \alert<2>{End-to-end testing}
+            % \begin{itemize}
+            %     \item Run the program and examine its output
+            %     \item Fairly effective for chaotic systems (like HPCCG), but can miss edge-cases in complex logic % Elucidated weird bug in both versions given non-associativity of floating point operations
+            % \end{itemize}
+            \item Formal methods
+            % \begin{itemize}
+            %     \item Techniques such as Hoare Logic \cite{hoareAxiomaticBasisComputer1969} allow formal reasoning about programs
+            % \end{itemize}
+            \item LLVM analysis
+            % \begin{itemize}
+            %     \item Since the translated code does the same thing, generated LLVM IR may look similar
+            % \end{itemize}
+            \item \alert<2>{Unit testing}
+            % \begin{itemize}
+            %     \item Drive small code units and examine their outputs
+            %     \item Can provide confidence about these units \textit{individually}
+            %     \item Requires manual duplication across both languages, if no tooling exists...
+            % \end{itemize}
         \end{enumerate}
     \end{itemize}
     % End-to-end testing (is fairly effective for chaotic systems like HPCCG)
@@ -574,40 +635,59 @@ lhs.par_iter()
     \only<2>{\centering\large\alert{What if we could leverage this during translation...?}}
 \end{frame}
 
-\begin{frame}{Novel tool \#1: Polyglotest \ i}
-    % TODO: Re-work this slide
-    \begin{overprint}
-        \onslide<1-3>
-            \begin{alertblock}{Key Insight}
-                \vspace*{0.25cm}
-                Running existing unit tests from the original implementation on the translated one gives strong guarantees of equivalence.
-            \end{alertblock}
-            \vspace*{1cm}
-            \begin{itemize}
-                \item Write/use existing unit tests for the original C++ code to drive translated Rust code
-                \item How do we do this?
-                \begin{itemize}
-                    \item<2-> Use a ``foreign function interface'' bridge like \texttt{cxx}
-                \end{itemize}
-                \item<3-> \textit{But our software output is in Rust, shouldn't we be getting rid of C++ unit tests?}
-            \end{itemize}
-        \onslide<4->
-            \begin{alertblock}{Key Insight}
-                \vspace*{0.25cm}
-                Running unit tests from the \sout{original} \textit{translated} implementation on the \sout{translated} \textit{original} one gives strong guarantees of equivalence.
-            \end{alertblock}
-            \vspace*{1cm}
-            \begin{itemize}
-                \item Write unit tests for the \textit{translated Rust} code to drive \textit{original C++} code
-                \begin{itemize}
-                    \item Again, use a ``foreign function interface'' bridge like \texttt{autocxx}
-                \end{itemize}
-                \vspace*{0.5cm}
-                \item<5-> \alert{We can now do \textbf{pure} Test-Driven Development to translate our Rust code!}
-            \end{itemize}
-    \end{overprint}
+% \begin{frame}{Novel tool \#1: Polyglotest \ i}
+%     % TODO: Re-work this slide
+%     \begin{overprint}
+%         \onslide<1-3>
+%             \begin{alertblock}{Key Insight}
+%                 \vspace*{0.25cm}
+%                 Running existing unit tests from the original implementation on the translated one gives strong guarantees of equivalence.
+%             \end{alertblock}
+%             \vspace*{1cm}
+%             \begin{itemize}
+%                 \item Write/use existing unit tests for the original C++ code to drive translated Rust code
+%                 \item How do we do this?
+%                 \begin{itemize}
+%                     \item<2-> Use a ``foreign function interface'' bridge like \texttt{cxx}
+%                 \end{itemize}
+%                 \item<3-> \textit{But our software output is in Rust, shouldn't we be getting rid of C++ unit tests?}
+%             \end{itemize}
+%         \onslide<4->
+%             \begin{alertblock}{Key Insight}
+%                 \vspace*{0.25cm}
+%                 Running unit tests from the \sout{original} \textit{translated} implementation on the \sout{translated} \textit{original} one gives strong guarantees of equivalence.
+%             \end{alertblock}
+%             \vspace*{1cm}
+%             \begin{itemize}
+%                 \item Write unit tests for the \textit{translated Rust} code to drive \textit{original C++} code
+%                 \begin{itemize}
+%                     \item Again, use a ``foreign function interface'' bridge like \texttt{autocxx}
+%                 \end{itemize}
+%                 \vspace*{0.5cm}
+%                 \item<5-> \alert{We can now do \textbf{pure} Test-Driven Development to translate our Rust code!}
+%             \end{itemize}
+%     \end{overprint}
+% \end{frame}
 
+\begin{frame}{Novel tool \#1: Polyglotest \ i}
+    \begin{alertblock}{Key Insight}
+        \vspace*{0.25cm}
+        Shared passing unit tests on both the original and translated implementations gives strong guarantees of equivalence.
+    \end{alertblock}
+    \vspace*{0.5cm}
+    \begin{enumerate}
+        \item<2-> Write unit tests in Rust which drive the original C++ code
+        \begin{itemize}
+            \item ``Arrange'' and ``Assert'' phases are selected
+            \item ``Act'' phase binds to C++ code units
+            \item Use a ``foreign function interface'' bridge like \texttt{autocxx}
+        \end{itemize}
+        \item<3-> Switch unit tests to drive unwritten Rust translation
+    \end{enumerate}
+    \vspace*{0.5cm}
+    \only<4>{\centering\large\alert{We can now do \textbf{pure} Test-Driven Development during translation!}}
 \end{frame}
+
 
 \begin{frame}[fragile]{Novel tool \#1: Polyglotest \ ii}
         \begin{columns}[T,onlytextwidth]
@@ -681,37 +761,66 @@ fn test_ddot() {
         \end{columns}
 \end{frame}
 
+\begin{frame}{Equivalence Checking Requirements}
+    \begin{itemize}
+        \item[\done\ \ 3.]
+          Build tooling for running Rust unit tests on C++ code
+          (\textbf{Could have})
+        \item[\done\ \ 4.]
+          Write unit tests for the original C++ version of the
+          mini-app
+          (\textbf{Should have}, \textit{depends on 1, (3)})
+        \item[\done\ \ 7.]
+          Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
+          (\textbf{Must have}, \textit{depends on 5}))
+        \item[\done\ \ 8.]
+          Equivalence check serial translated code by applying passing C++ unit tests to rust code
+          (\textbf{Must have}, \textit{depends on 4, 5})
+        \item[\wontfix\ \ 9.]
+          Equivalence check serial translated code with limited formal verification techniques
+          (\textbf{Could have}, \textit{depends on 5})
+        \item[\partialdone\ 10.]
+          Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
+          (\textbf{Could have}, \textit{depends on 5})
+        \item[\done\ 12.]
+          Equivalence check parallel translated code via all previous techniques
+          (\textbf{Must have}, \textit{depends on 7, 8, (9), (10), 11})
+        \item[\done\ 16.]
+          Equivalence check clustered translated code via all previous techniques
+          (\textbf{Could have}, \textit{depends on 7, 8, (9), (10), 15})
+    \end{itemize}
+\end{frame}
 
 
 
 \section{Performance Analysis}
-\begin{frame}{Performance Analysis Techniques}
-    % TODO: Re-work this slide
-    \begin{itemize}
-        \item Near-peer performance is key for Rust to be viable
-        \item Two different ways of assessing performance
-        \begin{enumerate}
-            \item Performance profilers
-            \item Direct comparison
-        \end{enumerate}
-    \end{itemize}
-\end{frame}
+% \begin{frame}{Performance Analysis Techniques}
+%     % TODO: Re-work this slide
+%     \begin{itemize}
+%         \item Near-peer performance is key for Rust to be viable
+%         \item Two different ways of assessing performance
+%         \begin{enumerate}
+%             \item Performance profilers
+%             \item Direct comparison
+%         \end{enumerate}
+%     \end{itemize}
+% \end{frame}
 
-\begin{frame}{Analysis with \texttt{perf} \ i}
-    \begin{figure}[H]
-        \includegraphics[width=0.85\textwidth]{images/perf_annot_cmp.png}
-        \caption{A screenshot of the \texttt{perf} tool showing hotspots in the C++ (left) and Rust (right) sparse matrix-vector multiplication kernels.}
-        \label{fig:perfAnnotCmp}
-    \end{figure}
-\end{frame}
+% \begin{frame}{Analysis with \texttt{perf} \ i}
+%     \begin{figure}[H]
+%         \includegraphics[width=0.85\textwidth]{images/perf_annot_cmp.png}
+%         \caption{A screenshot of the \texttt{perf} tool showing hotspots in the C++ (left) and Rust (right) sparse matrix-vector multiplication kernels.}
+%         \label{fig:perfAnnotCmp}
+%     \end{figure}
+% \end{frame}
 
-\begin{frame}{Analysis with \texttt{perf} \ ii}
-    \begin{figure}[H]
-        \includegraphics[width=0.65\textwidth]{images/perf_annot_labelled.png}
-        \caption{An annotated screenshot of the \texttt{perf} tool showing how ownership checks dominate the proportion of time taken in the Rust implementation, reducing total performance.}
-        \label{fig:perfAnnotLabelled}
-    \end{figure}
-\end{frame}
+% \begin{frame}{Analysis with \texttt{perf} \ ii}
+%     \begin{figure}[H]
+%         \includegraphics[width=0.65\textwidth]{images/perf_annot_labelled.png}
+%         \caption{An annotated screenshot of the \texttt{perf} tool showing how ownership checks dominate the proportion of time taken in the Rust implementation, reducing total performance.}
+%         \label{fig:perfAnnotLabelled}
+%     \end{figure}
+% \end{frame}
 
 % \begin{frame}{Analysis with Intel\textsuperscript{\textregistered}\ vTune\texttrademark}
 %     % TODO: Drop this slide
@@ -722,7 +831,7 @@ fn test_ddot() {
 %     \end{figure}
 % \end{frame}
 
-\begin{frame}{Novel tool \#2: HPC MultiBench}
+\begin{frame}{Novel tool \#2: HPC MultiBench \ i}
     \begin{itemize}
         \item<1-> Manually spawning many similar jobs with different configurations is tedious!
         \begin{itemize}
@@ -735,76 +844,99 @@ fn test_ddot() {
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Returning to the live demo}
-    By the end of this demo, I will have shown:
-    \begin{enumerate}
-        \item <1-> How a test plan can be defined using a YAML file
-        \item <2-> How runs to exercise a metric over a set of configurations can automatically be created
-        \begin{itemize}
-            \item Remember the beginning of the talk...?
-        \end{itemize}
-        \item <3-> How metrics from completed runs can be aggregated and visualised
-        % TODO: Get documentation working!
-        % \item <4-> Documentation for the tool
-    \end{enumerate}
-    \vspace*{0.5cm}
-    \alert{It will also show all the directly measured results for comparing C++ and Rust performance}
+
+\begin{frame}{Novel tool \#2: HPC MultiBench \ ii}
+    \vspace{0.2cm}
+    \large\begin{displayquote}
+        ``Anything I have done in the past I think I could do in the YAML file.''\newline
+        \hspace*{0.5cm}-- Toby Flynn (Warwick PhD candidate)
+    \end{displayquote}
+    \vspace{1cm}
+    \large\begin{displayquote}
+        ``I would use it for sure -- the problem you think exists definitely does.''\newline
+        \hspace*{0.5cm} -- Sam Curtis (Warwick PhD candidate)
+    \end{displayquote}
 \end{frame}
 
 
+\begin{frame}{Returning to the live demo}
+    \note[item]{How a test plan can be defined using a YAML file}
+    \note[item]{Automatic creation of runs specified by the YAML file}
+    \note[item]{How metrics from completed runs can be aggregated and visualised}
+    \note[item]{Directly measured results for comparing C++ and Rust performance}
+    % By the end of this demo, I will have shown:
+    % \begin{enumerate}
+    %     \item How a test plan can be defined using a YAML file
+    %     \item Automatic creation of runs specified by the YAML file
+    %     \item How metrics from completed runs can be aggregated and visualised
+    %     \item Directly measured results for comparing C++ and Rust performance
+    % \end{enumerate}
 
-% Serial vs Threading
-% Threading vs mpi vs hybrid
-
-% serial
-% threading
-% mpi
-% hybrid
- % CPP / Kokkos / Rust
-
-% multinodal (live demo)
-% strong/weak scaling (live demo)
-
-% Summary slide to explicitly answer the question
+    % TODO: Clickable link to backup slides
+\end{frame}
 
 
 % \begin{frame}{Overview of results \ i}
-%     % Strong/weak scaling
+%     % Serial comparison
 % \end{frame}
-
 % \begin{frame}{Overview of results \ ii}
-%     % CPP / Kokkos / Rust
+%     % Parallel comparison
 % \end{frame}
-
-% \begin{frame}{Parallelism strategies \ iii}
-%     % All the different versions against each other
+% \begin{frame}{Overview of results \ iii}
+%     % Multi-nodal MPI comparison
 % \end{frame}
-
-
-% \begin{frame}{Roofline Models}
+% \begin{frame}{Overview of results \ iv}
+%     % Multi-nodal Hybrid comparison
 % \end{frame}
-
-\begin{frame}{Applying Roofline Models to HPCCG}
-    % Add `lscpu` for my machine alongside it
-    \begin{figure}[H]
-        \includegraphics[width=0.65\textwidth]{images/Athena_ERT_generated_roofline.pdf}
-        \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \cite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \cite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
-        \label{fig:intelvtune}
-    \end{figure}
-\end{frame}
+% \begin{frame}{Overview of results \ v}
+%     % CPP / Kokkos / Rust comparison
+% \end{frame}
+% \begin{frame}{Overview of results \ vi}
+%     % Multi-nodal Strong scaling
+% \end{frame}
+% \begin{frame}{Overview of results \ vii}
+%     % Multi-nodal Weak scaling
+% \end{frame}
+% \begin{frame}{Overview of results \ viii}
+%     % Add `lscpu` for my machine alongside it
+%     \begin{figure}[H]
+%         \includegraphics[width=0.65\textwidth]{images/Athena_ERT_generated_roofline.pdf}
+%         \caption{A Roofline Diagram generated using the Empirical Roofline Toolkit \cite{yangEmpiricalRooflineMethodology2018}, with data-points measured using LIKWID \cite{treibigLIKWIDLightweightPerformance2012} showing serial and parallel implementations of HPCCG in Rust and C++.}
+%         \label{fig:intelvtune}
+%     \end{figure}
+% \end{frame}
+% \begin{frame}{Back to the plan...}
+    % TODO: Clickable link back to here
+% \end{frame}
 
 \begin{frame}{Summary of Performance Analysis}
     % TODO: Add summary plot
     \begin{itemize}
-        \item Rust is non-negligbly slower than C++
+        \item Rust is non-negligibly slower than C++
         \item In certain applications, this may be acceptable due to other commensurate benefits
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Performance Analysis Requirements \ i}
+    \begin{itemize}
+        \item[\done\ 13.]
+          Carry out a performance analysis of the serial translated Rust code with the original C++ code
+          (\textbf{Must have}, \textit{depends on 5})
+        \item[\done\ 14.]
+          Carry out a performance analysis of the parallel translated Rust code with the original C++ code
+          (\textbf{Must have}, \textit{depends on 11})
+        \item[\done\ 17.]
+          Carry out a performance analysis of the clustered translated Rust code with the original C++ code
+          (\textbf{Could have}, \textit{depends on 15})
     \end{itemize}
 \end{frame}
 
 
 
+
+
+
 \section{Project management}
-% Can be a little light, but very very required
 
 \begin{frame}{Agile Workflows}
     \begin{figure}[h]
@@ -851,85 +983,88 @@ fn test_ddot() {
         \centering
         \includegraphics[width=\textwidth]{images/actual_gantt_chart.png}
         \caption{The actual timeline of the project. The progress report was more all-encompassing, parallelisation was easier, and clustering was harder than expected}
+        % \caption{The actual timeline of the project. An agile methodology allowed me to overcome the fact that the progress report was more all-encompassing, parallelisation was easier, and clustering was harder than expected}
         \label{fig:actual_gantt_chart}
     \end{figure}
 \end{frame}
 
+% \begin{frame}{Unforeseen problems}
+% \end{frame}
 
 
 \section{Conclusion}
 
-\begin{frame}{Requirements \ i}
-    \begin{enumerate}
-        \item[\done\ \ 1.]
-          Select a target mini-app from ECP proxy applications or UK-MAC
-          (\textbf{Must have})
-        \item[\done\ \ 2.]
-          Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
-          (\textbf{Should have}, \textit{depends on 1})
-        \item[\done\ \ 3.]
-          Build tooling for running Rust unit tests on C++ code
-          (\textbf{Could have})
-        \item[\done\ \ 4.]
-          Write unit tests for the original C++ version of the
-          mini-app
-          (\textbf{Should have}, \textit{depends on 1, (3)})
-        \item[\done\ \ 5.]
-          Write direct translation of serial version mini-app from C++ to Rust
-          (\textbf{Must have}, \textit{depends on 1})
-        \item[\done\ \ 6.]
-          Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
-          (\textbf{Should have}, \textit{depends on 5})
-    \end{enumerate}
-\end{frame}
+% \begin{frame}{Requirements \ i}
+%     \begin{itemize}
+%         \item[\done\ \ 1.]
+%           Select a target mini-app from ECP proxy applications or UK-MAC
+%           (\textbf{Must have})
+%         \item[\done\ \ 2.]
+%           Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \cite{millerEmpiricalStudyReliability1990}\cite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \cite{stepanovMemorySanitizerFastDetector2015}
+%           (\textbf{Should have}, \textit{depends on 1})
+%         \item[\done\ \ 3.]
+%           Build tooling for running Rust unit tests on C++ code
+%           (\textbf{Could have})
+%         \item[\done\ \ 4.]
+%           Write unit tests for the original C++ version of the
+%           mini-app
+%           (\textbf{Should have}, \textit{depends on 1, (3)})
+%         \item[\done\ \ 5.]
+%           Write direct translation of serial version mini-app from C++ to Rust
+%           (\textbf{Must have}, \textit{depends on 1})
+%         \item[\done\ \ 6.]
+%           Modify serial version of translated code to be idiomatic Rust \cite{endlerMreIdiomaticrust2023} 
+%           (\textbf{Should have}, \textit{depends on 5})
+%     \end{itemize}
+% \end{frame}
 
-\begin{frame}{Requirements \ ii}
-    \begin{enumerate}
-        \item[\done\ \ 7.]
-          Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
-          (\textbf{Must have}, \textit{depends on 5}))
-        \item[\done\ \ 8.]
-          Equivalence check serial translated code by applying passing C++ unit tests to rust code
-          (\textbf{Must have}, \textit{depends on 4, 5})
-        \item[\wontfix\ \ 9.]
-          Equivalence check serial translated code with limited formal verification techniques
-          (\textbf{Could have}, \textit{depends on 5})
-        \item[\partialdone\ 10.]
-          Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
-          (\textbf{Could have}, \textit{depends on 5})
-        \item[\done\ 11.]
-          Modify the serial translated code to allow parallel execution
-          (\textbf{Must have}, \textit{depends on 5})
-        \item[\done\ 12.]
-          Equivalence check parallel translated code via all previous techniques
-          (\textbf{Must have}, \textit{depends on 7, 8, (9), (10), 11})
-        \item[\done\ 13.]
-          Carry out a performance analysis of the serial translated Rust code with the original C++ code
-          (\textbf{Must have}, \textit{depends on 5})
-    \end{enumerate}
-\end{frame}
+% \begin{frame}{Requirements \ ii}
+%     \begin{itemize}
+%         \item[\done\ \ 7.]
+%           Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
+%           (\textbf{Must have}, \textit{depends on 5}))
+%         \item[\done\ \ 8.]
+%           Equivalence check serial translated code by applying passing C++ unit tests to rust code
+%           (\textbf{Must have}, \textit{depends on 4, 5})
+%         \item[\wontfix\ \ 9.]
+%           Equivalence check serial translated code with limited formal verification techniques
+%           (\textbf{Could have}, \textit{depends on 5})
+%         \item[\partialdone\ 10.]
+%           Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
+%           (\textbf{Could have}, \textit{depends on 5})
+%         \item[\done\ 11.]
+%           Modify the serial translated code to allow parallel execution
+%           (\textbf{Must have}, \textit{depends on 5})
+%         \item[\done\ 12.]
+%           Equivalence check parallel translated code via all previous techniques
+%           (\textbf{Must have}, \textit{depends on 7, 8, (9), (10), 11})
+%         \item[\done\ 13.]
+%           Carry out a performance analysis of the serial translated Rust code with the original C++ code
+%           (\textbf{Must have}, \textit{depends on 5})
+%     \end{itemize}
+% \end{frame}
 
-\begin{frame}{Requirements \ iii}
-    \begin{enumerate}
-        \item[\done\ 14.]
-          Carry out a performance analysis of the parallel translated Rust code with the original C++ code
-          (\textbf{Must have}, \textit{depends on 11})
-        \item[\done\ 15.]
-          Modify the parallel translated code to allow execution across clustered compute resources
-          (\textbf{Could have}, \textit{depends on 11})
-        \item[\done\ 16.]
-          Equivalence check clustered translated code via all previous techniques
-          (\textbf{Could have}, \textit{depends on 7, 8, (9), (10), 15})
-        \item[\done\ 17.]
-          Carry out a performance analysis of the clustered translated Rust code with the original C++ code
-          (\textbf{Could have}, \textit{depends on 15})
-    \end{enumerate}
-\end{frame}
+% \begin{frame}{Requirements \ iii}
+%     \begin{itemize}
+%         \item[\done\ 14.]
+%           Carry out a performance analysis of the parallel translated Rust code with the original C++ code
+%           (\textbf{Must have}, \textit{depends on 11})
+%         \item[\done\ 15.]
+%           Modify the parallel translated code to allow execution across clustered compute resources
+%           (\textbf{Could have}, \textit{depends on 11})
+%         \item[\done\ 16.]
+%           Equivalence check clustered translated code via all previous techniques
+%           (\textbf{Could have}, \textit{depends on 7, 8, (9), (10), 15})
+%         \item[\done\ 17.]
+%           Carry out a performance analysis of the clustered translated Rust code with the original C++ code
+%           (\textbf{Could have}, \textit{depends on 15})
+%     \end{itemize}
+% \end{frame}
 
 \begin{frame}{Evaluation}
     \begin{itemize}
         \item Achieved all \textbf{M}ust/\textbf{S}hould have specification points, including stretch goal of assessing clustered compute
-        \item Successfully ``Assessed the Viability of Rust in HPC'', answering the project question
+        \item ``Assessed the Viability of Rust in HPC'', answering the project question
         \vspace{0.5cm}
         \item<2-> \alert{Actively improved} the viability of Rust in HPC, by:
         \begin{itemize}
@@ -948,6 +1083,7 @@ fn test_ddot() {
             \item Plan to pull request documentation to both \texttt{autocxx} and \texttt{rs-mpi}
             % kokkos mini-apps add HPCCG Kokkos version
         \end{itemize}
+        \vspace*{0.25cm}
         \item Repositories to release once project has been assessed
         \begin{itemize}
             \item \texttt{hpccg-rs} A Rust translation of the HPCCG mini-application
@@ -969,9 +1105,9 @@ fn test_ddot() {
     \vspace{1cm}
     \item<2-> \alert{Publish and maintain novel tools developed} as open source repositories
     \begin{itemize}
-        \item<3-> If any of them start getting interest, will respond to pull requests/issues as far as possible
+        \item If any of them start getting interest, will respond to pull requests/issues as far as possible
     \end{itemize}
-    \item<4-> \alert{Aim to submit a paper} based on the project to P3HPC
+    \item<3-> \alert{Aim to submit a paper} based on the project to P3HPC
 \end{itemize}
 \end{frame}
 
