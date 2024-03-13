@@ -29,9 +29,9 @@
 
 \usepackage{pgfpages}
 %\setbeamertemplate{note page}{\vspace*{0.75cm}\insertnote}
-%\setbeameroption{show notes on second screen=right}
+\setbeameroption{show notes on second screen=right}
 % \setbeameroption{show notes}
-\setbeameroption{hide notes}
+% \setbeameroption{hide notes}
 
 
 \title{Assessing the Viability of Rust in HPC}
@@ -46,7 +46,13 @@
 
 \maketitle
     \note[itemize]{
-        \item Agenda will be:
+        \item Pre-flight checklist:
+        \begin{enumerate}
+            \item SSH direct into kudu in correct directory + test
+            \item Correct local directory + test
+            \item Teams/camera stuff
+        \end{enumerate}
+        \item Agenda:
         \begin{enumerate}
             \item Project background
             \item Translation process
@@ -82,17 +88,17 @@
         \begin{itemize}
             % TODO: Make this list less ugly
             \item Performant
-                \note[item]{No garbarge collection needed}
-                \note[item]{Offers low-level abstractions for the computer hardware, facilitating performant code\newline}
+                \note[item]{No garbarge collection}
+                \note[item]{Low-level abstractions\newline}
             \item Productive
-                \note[item]{Robust toolchain, including canonical linters (\texttt{clippy}), auto-formatters (\texttt{rustfmt}), and a centralised package repository (\texttt{crates.io})\newline}
+                \note[item]{Robust toolchain\newline} % including canonical linters (\texttt{clippy}), auto-formatters (\texttt{rustfmt}), and a centralised package repository (\texttt{crates.io})
             \item Reliable
-                \note[item]{Rich type system, with foundation in programming languages like Haskell}
-                \note[item]{Guarantees of safety by preventing undefined behaviour at compile time\newline}
+                \note[item]{Rich type system, pedigree from functional languages}
+                \note[item]{Prevents undefined behaviour at compile time\newline}
         \end{itemize}
         \vspace*{0.25cm}
         \item Eliminates ``undefined behaviour'' by compiler rules
-            \note[item]{Specifically, its ownership model which works by counting mutable and immutable references to data}
+            \note[item]{Ownership model, mutable/immutable reference counting}
         \begin{itemize}
             \item Encompasses memory and thread safety
             \item Over 70\% of security bugs in the Chromium project related to memory safety \footcite{MemorySafety}
@@ -110,11 +116,9 @@
     Has been in the news even in the last month due to:
     \begin{itemize}
         \item White House Office of the National Cyber Director publishing a press release ``Future Software Should Be Memory Safe'' \footcite{PressReleaseFuture2024}  % (February 26th)
-            \note[item]{Explicitly mentioning moving critical codebases to Rust as a part of US national cyber security policy}
         \item Google pledging \$1 million to improve Rust/C++ interoperability \footcite{ImprovingInteroperabilityRust}  % (February 5th)
         \begin{itemize}
             \item<2-> \alert{Blog post mentions tooling such as \texttt{autocxx} as part of this effort}
-                \note[item]{\texttt{autocxx}, is a tool to which I had already pull requested integration tests in the course of the project}
         \end{itemize}
     \end{itemize}
 
@@ -125,6 +129,9 @@
             \caption{A screenshot of my merged pull request into \texttt{autocxx}}
             \label{fig:warwick_mantevo_link}
         \end{figure}
+            \note[item]{I pull requested integration tests}
+            \note[item]{Proved it is possible to bind functions with array parameters}
+            \note[item]{Very common in HPC codebases!}
     }
 \end{frame}
 
@@ -133,13 +140,9 @@
         \vspace{0.2cm}
         ``Technology that uses clusters of powerful processors, working in \textbf{parallel}, to process massive multidimensional datasets (\textbf{big data}) and solve complex problems at \textbf{extremely high speeds}.'' -- IBM \footcite{WhatHPCIntroduction}
     \end{displayquote}
-        \note[item]{Often referred to by the initialism ``HPC''\newline}
-        \note[item]{Parallel computation}
         \note[item]{Within UMA machines with vectorisation and threading}
         \note[item]{Across NUMA clusters over TCP/IP networks\newline}
-        \note[item]{Large data-sets}
         \note[item]{Often terabytes and beyond\newline}
-        \note[item]{High speeds}
         \note[item]{Overall goal of HPC is going as fast as possible...}
 \end{frame}
 
@@ -174,7 +177,6 @@
         \column{0.5\textwidth}
             \begin{itemize}
                 \item ``The original Mantevo mini-app'' \footcite{MantevoHPCCG2023}
-                \vspace{0.5cm}
                 \item Designed to be ``the best approximation to an unstructured implicit finite element or finite volume application in 800 lines or fewer.''
                 \item Based on the iterative method of gradient descent for conjugate gradients first proposed by Hestnes and Steifel in 1952 \footcite{hestenesMethodsConjugateGradients1952}
                 \item Small C++ codebase with dependent only on \texttt{OpenMP} and \texttt{MPI}
@@ -203,7 +205,7 @@
         \caption{The output from running HPCCG over a small mesh}
     \end{figure}
         \note[item]{HPCCG compiles to a standalone binary}
-        \note[item]{Can be optionally compiled with OpenMP and MPI}
+        % \note[item]{Can be optionally compiled with OpenMP and MPI}
         \note[item]{This binary takes three parameters, the x y and z sizes of the mesh it runs on}
         \note[item]{It prints out its state as it performs iterations}
         \note[item]{When its done, it gives a performance summary}
@@ -217,16 +219,23 @@
         \vspace*{0.75cm}
         \label{fig:excalidraw_p3_triangle}
     \end{figure}
-        \note[item]{Performance}
-        \note[item]{This is something the project assesses!}
-        \note[item]{Rust needs to nearly or as fast as C++ to be viable\newline}
-        \note[item]{Productivity}
-        \note[item]{Ergonomic syntax, most loved language with rich type system etc.}
-        \note[item]{Good, canonical toolchain (\texttt{cargo}, \texttt{rustfmt}, \texttt{clippy}, ...)}
-        \note[item]{Compiler check which make writing bug-free code easier\newline}
-        \note[item]{Productivity}
-        \note[item]{Rust toolchain is very portable, not like c++ with 5+ different proprietary compilers with slightly different flags (\texttt{rustc} / \texttt{LLVM} vs \texttt{gcc}, \texttt{icpc}, \texttt{clang}, ...)}
-        \note[item]{Still capable of machine-specific optimisations with native architecture flag}
+        \note[item]{Portability and productivity affect calculus\newline}
+        \note[item]{C++ very fast}
+        \note[item]{Weak portability/productivity with many compilers...\newline}
+        \note[item]{Kokkos provides portability/productivity}
+        \note[item]{Incurs slight performance overhead\newline}
+        \note[item]{Rust similar benefits to Kokkos}
+        \note[item]{Slight performance overhead acceptable}
+        % \note[item]{Performance}
+        % \note[item]{This is something the project assesses!}
+        % \note[item]{Rust needs to nearly or as fast as C++ to be viable\newline}
+        % \note[item]{Productivity}
+        % \note[item]{Ergonomic syntax, most loved language with rich type system etc.}
+        % \note[item]{Good, canonical toolchain (\texttt{cargo}, \texttt{rustfmt}, \texttt{clippy}, ...)}
+        % \note[item]{Compiler check which make writing bug-free code easier\newline}
+        % \note[item]{Productivity}
+        % \note[item]{Rust toolchain is very portable, not like c++ with 5+ different proprietary compilers with slightly different flags (\texttt{rustc} / \texttt{LLVM} vs \texttt{gcc}, \texttt{icpc}, \texttt{clang}, ...)}
+        % \note[item]{Still capable of machine-specific optimisations with native architecture flag}
 \end{frame}
 
 \begin{frame}{Project Initiation Requirements}
@@ -255,7 +264,6 @@
             \begin{itemize}
                 \item There are more valid C++ programs\newline than (safe) Rust programs!
                     \note[item]{In a similar sense to moving from un-typed to type lambda calculi}
-                    \note[item]{Could be considered an extension to Barendregt’s Lambda cube}
                 \item Rust explicitly prohibits undefined behaviour by default
                 \begin{itemize}
                     \item This is normally a good thing!
@@ -274,19 +282,6 @@
             \label{fig:warwick_mantevo_link}
         \end{figure}
     \end{columns}
-% TODO: Add examples of mesh implementation
-%
-% int  * nnz_in_row;
-% double ** ptr_to_vals_in_row;
-% double * list_of_vals;
-%
-% nnz_in_row: Vec<usize>
-% row_start_inds: Vec<usize>
-% list_of_vals: Vec<f64>
-%
-% nnz_in_row: Vec<i64>,
-% ptr_to_vals_in_row: Vec<Rc<RefCell<f64>>>,
-% list_of_vals: Vec<f64>,
 \end{frame}
 
 \begin{frame}[fragile]{Fearless Parallelism in Rust}
@@ -296,7 +291,7 @@
             \item Many concurrency bugs moved from runtime to compile-time
                 \note[item]{Ownership and type systems provide strong guarantees against undefined behaviour}
                 \note[item]{Non thread-safe code often doesn't even compile, reducing the need to debug flaky race conditions}
-            \item Ubiquitous crates provide very high-level abstractions
+            \item Crates provide very high-level abstractions
         \end{itemize}
     \end{itemize}    
     \vspace*{0.15cm}
@@ -320,12 +315,12 @@ double dot_product (
         \begin{subfigure}[c]{.45\textwidth}\centering
             \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn dot_product(
-lhs: &[f64], rhs: &[f64]
+    lhs: &[f64], rhs: &[f64]
 ) -> f64 {
-lhs.iter()
-    .zip(rhs.iter())
-    .map(|(x, y)| x * y)
-    .sum()
+    lhs.iter()
+        .zip(rhs.iter())
+        .map(|(x, y)| x * y)
+        .sum()
 }
             \end{minted}
             \label{fig:rust-ddot-serial}
@@ -335,12 +330,12 @@ lhs.iter()
     \end{figure}
 \end{frame}
 
-\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+\begin{frame}[fragile]{Fearless Parallelism in Rust}
     \begin{itemize}
         \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
-            \item Ubiquitous crates provide very high-level abstractions
+            \item Crates provide very high-level abstractions
         \end{itemize}
     \end{itemize}    
     \vspace*{0.15cm}
@@ -370,12 +365,12 @@ double dot_product (
         \begin{subfigure}[c]{.45\textwidth}\centering
             \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn dot_product(
-lhs: &[f64], rhs: &[f64]
+    lhs: &[f64], rhs: &[f64]
 ) -> f64 {
-lhs.iter()
-    .zip(rhs.iter())
-    .map(|(x, y)| x * y)
-    .sum()
+    lhs.iter()
+        .zip(rhs.iter())
+        .map(|(x, y)| x * y)
+        .sum()
 }
             \end{minted}
             \label{fig:rust-ddot-serial-2}
@@ -385,12 +380,12 @@ lhs.iter()
     \end{figure}
 \end{frame}
 
-\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+\begin{frame}[fragile]{Fearless Parallelism in Rust}
     \begin{itemize}
         \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
-            \item Ubiquitous crates provide very high-level abstractions
+            \item Crates provide very high-level abstractions
         \end{itemize}
     \end{itemize}    
     \vspace*{0.15cm}
@@ -416,12 +411,12 @@ double dot_product (
         \begin{subfigure}[c]{.45\textwidth}\centering
             \begin{minted}[escapeinside=||,linenos]{rust}
 pub fn dot_product(
-lhs: &[f64], rhs: &[f64]
+    lhs: &[f64], rhs: &[f64]
 ) -> f64 {
-lhs.iter()
-    .zip(rhs.iter())
-    .map(|(x, y)| x * y)
-    .sum()
+    lhs.iter()
+        .zip(rhs.iter())
+        .map(|(x, y)| x * y)
+        .sum()
 }
             \end{minted}
             \label{fig:rust-ddot-serial-3}
@@ -431,12 +426,12 @@ lhs.iter()
     \end{figure}
 \end{frame}
 
-\begin{frame}[fragile, noframenumbering]{Fearless Parallelism in Rust}
+\begin{frame}[fragile]{Fearless Parallelism in Rust}
     \begin{itemize}
         \item One of Rust's key selling points is ``Fearless Parallelism''
         \begin{itemize}
             \item Many concurrency bugs moved from runtime to compile-time
-            \item Ubiquitous crates provide very high-level abstractions
+            \item Crates provide very high-level abstractions
         \end{itemize}
     \end{itemize}    
     \vspace*{0.15cm}
@@ -464,24 +459,24 @@ double dot_product (
 use rayon::prelude::*; 
 
 pub fn dot_product(
-lhs: &[f64], rhs: &[f64]
+    lhs: &[f64], rhs: &[f64]
 ) -> f64 {
-lhs.par_iter()
-    .zip(rhs.par_iter())
-    .map(|(x, y)| x * y)
-    .sum()
+    lhs.par_iter()
+        .zip(rhs.par_iter())
+        .map(|(x, y)| x * y)
+        .sum()
 }
             \end{minted}
             \label{fig:rust-ddot-rayon}
             \vspace*{0.1cm}
             \caption{Rust Rayon implementation}
-            \only<2> {
-                \begin{tikzpicture}[remember picture,overlay]
-                    \draw[red, very thick] (-0.9,3.1) rectangle (1.1,2.65);
-                    \draw[red, very thick] (-2.6,3.6) rectangle (-0.5,3.15);
-                    % \draw[red, very thick] (-2.5,3.75) rectangle (0,3.15);
-                \end{tikzpicture}
-            }
+            % \only<2> {
+            \begin{tikzpicture}[remember picture,overlay]
+                \draw[red, very thick] (-0.1,3.1) rectangle (1.9,2.65);
+                \draw[red, very thick] (-1.7,3.6) rectangle (0.2,3.15);
+                % \draw[red, very thick] (-2.5,3.75) rectangle (0,3.15);
+            \end{tikzpicture}
+            % }
         \end{subfigure}
     \end{figure}
 \end{frame}
@@ -603,15 +598,14 @@ world.all_reduce_into(
         \begin{enumerate}
             \item \alert<2>{End-to-end testing}
                 \note[item]{Run the program and examine its output}
-                \note[item]{Fairly effective for chaotic systems (like HPCCG), but can miss edge-cases in complex logic (elucidated weird bug in both versions given non-associativity of floating point operations)\newline}
+                \note[item]{Can miss edge-cases in complex logic\newline}
             \item Formal methods
-                \note[item]{Techniques such as Hoare Logic allow formal reasoning about programs\newline}
+                \note[item]{Hoare Logic, doesn't scale well\newline}
             \item LLVM analysis
-                \note[item]{Since the translated code does the same thing, generated LLVM IR may look similar\newline}
+                \note[item]{Generated LLVM IR may look similar, doesn't scale well\newline}
             \item \alert<2>{Unit testing}
                 \note[item]{Drive small code units and examine their outputs}
                 \note[item]{Can provide confidence about these units \textit{individually}}
-                \note[item]{Requires manual duplication across both languages, if no tooling exists...\newline}
         \end{enumerate}
     \end{itemize}
 \end{frame}
@@ -623,18 +617,14 @@ world.all_reduce_into(
         \caption{A diagram showing the top-level workflow of the Test-Driven Development\footcite{beckTestDrivenDevelopment2022} methodology.}
         \label{fig:tdd_workflow}
     \end{figure}
-    \only<2>{
-        \vspace*{-0.5cm}
-        \centering\large\alert{What if we could leverage this during translation...?}
-        \vspace*{-0.4cm}
-    }
-    \vspace*{1cm}
+        \note[item]{TDD writes tests before code to pass them}
+        \note[item]{Helpful, but cumbersome in the real world}
 \end{frame}
 
 \begin{frame}{Novel tool \#1: Polyglotest \ i}
     \begin{alertblock}{Key Insight}
         \vspace*{0.25cm}
-        Shared passing unit tests on both the original and translated implementations gives strong guarantees of equivalence.
+        \textit{Shared passing unit tests on both the original and translated implementations gives strong guarantees of equivalence.}
     \end{alertblock}
     \vspace*{0.5cm}
     \begin{enumerate}
@@ -647,7 +637,7 @@ world.all_reduce_into(
         \item<3-> Switch unit tests to drive unwritten Rust translation
     \end{enumerate}
     \vspace*{0.5cm}
-    \only<4>{\centering\large\alert{We can now do \textbf{pure} Test-Driven Development during translation!}}
+    % \only<4>{\centering\large\alert{We can now do \textbf{pure} Test-Driven Development during translation!}}
 \end{frame}
 
 \begin{frame}[fragile]{Novel tool \#1: Polyglotest \ ii}
@@ -841,10 +831,10 @@ fn test_ddot() {
 
     \only<2->{
         \begin{tikzpicture}[remember picture,overlay]
-            \node[xshift=-2.5cm,yshift=-1.75cm] at (current page.north east) {\includegraphics[width=0.25\textwidth]{images/github_commit_plot.png}};
+            \node[xshift=-2.6cm,yshift=-1.75cm] at (current page.north east) {\includegraphics[width=0.25\textwidth]{images/github_commit_plot.png}};
         \end{tikzpicture}
         \begin{tikzpicture}[remember picture,overlay]
-            \node[xshift=-1cm,yshift=-2.65cm] at (current page.north east) {\includegraphics[width=0.115\textwidth]{images/github_streak.png}};
+            \node[xshift=-1cm,yshift=-2.9cm] at (current page.north east) {\includegraphics[width=0.115\textwidth]{images/github_streak.png}};
         \end{tikzpicture}
         \vspace*{-0.75cm}
     }
@@ -878,83 +868,14 @@ fn test_ddot() {
         \centering
         \includegraphics[width=\textwidth]{images/actual_gantt_chart.png}
         \caption{The actual timeline of the project. The progress report was more all-encompassing, parallelisation was easier, and clustering was harder than expected}
-        % \caption{The actual timeline of the project. An agile methodology allowed me to overcome the fact that the progress report was more all-encompassing, parallelisation was easier, and clustering was harder than expected}
+            \note[item]{Unforeseen problems in relative difficulty of tasks overcome by flexibility of agile}
         \label{fig:actual_gantt_chart}
     \end{figure}
 \end{frame}
 
-% \begin{frame}{Unforeseen problems}
-% \end{frame}
 
 
 \section{Conclusion}
-
-% \begin{frame}{Requirements \ i}
-%     \begin{itemize}
-%         \item[\done\ \ 1.]
-%           Select a target mini-app from ECP proxy applications or UK-MAC
-%           (\textbf{Must have})
-%         \item[\done\ \ 2.]
-%           Fuzz test\footnote{an automated testing technique which uses boundary and erroneous test data as inputs, whilst monitoring for resultant undesired behaviour, originally proposed by Miller \textit{et al.} in 1990 \footcite{millerEmpiricalStudyReliability1990}\footcite{liangFuzzingStateArt2018}} the possible mini-apps for memory safety issues using static analysis tooling \footcite{stepanovMemorySanitizerFastDetector2015}
-%           (\textbf{Should have}, \textit{depends on 1})
-%         \item[\done\ \ 3.]
-%           Build tooling for running Rust unit tests on C++ code
-%           (\textbf{Could have})
-%         \item[\done\ \ 4.]
-%           Write unit tests for the original C++ version of the
-%           mini-app
-%           (\textbf{Should have}, \textit{depends on 1, (3)})
-%         \item[\done\ \ 5.]
-%           Write direct translation of serial version mini-app from C++ to Rust
-%           (\textbf{Must have}, \textit{depends on 1})
-%         \item[\done\ \ 6.]
-%           Modify serial version of translated code to be idiomatic Rust \footcite{endlerMreIdiomaticrust2023} 
-%           (\textbf{Should have}, \textit{depends on 5})
-%     \end{itemize}
-% \end{frame}
-
-% \begin{frame}{Requirements \ ii}
-%     \begin{itemize}
-%         \item[\done\ \ 7.]
-%           Equivalence check serial translated code by comparing results of end-to-end tests with original C++ code
-%           (\textbf{Must have}, \textit{depends on 5}))
-%         \item[\done\ \ 8.]
-%           Equivalence check serial translated code by applying passing C++ unit tests to rust code
-%           (\textbf{Must have}, \textit{depends on 4, 5})
-%         \item[\wontfix\ \ 9.]
-%           Equivalence check serial translated code with limited formal verification techniques
-%           (\textbf{Could have}, \textit{depends on 5})
-%         \item[\partialdone\ 10.]
-%           Equivalence check serial translated code by comparing generated LLVM IR of the C++ and translated Rust versions
-%           (\textbf{Could have}, \textit{depends on 5})
-%         \item[\done\ 11.]
-%           Modify the serial translated code to allow parallel execution
-%           (\textbf{Must have}, \textit{depends on 5})
-%         \item[\done\ 12.]
-%           Equivalence check parallel translated code via all previous techniques
-%           (\textbf{Must have}, \textit{depends on 7, 8, (9), (10), 11})
-%         \item[\done\ 13.]
-%           Carry out a performance analysis of the serial translated Rust code with the original C++ code
-%           (\textbf{Must have}, \textit{depends on 5})
-%     \end{itemize}
-% \end{frame}
-
-% \begin{frame}{Requirements \ iii}
-%     \begin{itemize}
-%         \item[\done\ 14.]
-%           Carry out a performance analysis of the parallel translated Rust code with the original C++ code
-%           (\textbf{Must have}, \textit{depends on 11})
-%         \item[\done\ 15.]
-%           Modify the parallel translated code to allow execution across clustered compute resources
-%           (\textbf{Could have}, \textit{depends on 11})
-%         \item[\done\ 16.]
-%           Equivalence check clustered translated code via all previous techniques
-%           (\textbf{Could have}, \textit{depends on 7, 8, (9), (10), 15})
-%         \item[\done\ 17.]
-%           Carry out a performance analysis of the clustered translated Rust code with the original C++ code
-%           (\textbf{Could have}, \textit{depends on 15})
-%     \end{itemize}
-% \end{frame}
 
 \begin{frame}{Evaluation}
     \begin{itemize}
@@ -1028,26 +949,64 @@ fn test_ddot() {
 
 \begin{frame}{Overview of results \ i}
     % Serial comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/reference_line.png}
+        \label{fig:reference_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ ii}
     % Parallel comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/parallel_line_all.png}
+        \label{fig:reference_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ iii}
-    % Multi-nodal MPI comparison
+    % Parallel comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/parallel_line.png}
+        \label{fig:reference_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ iv}
-    % Multi-nodal Hybrid comparison
+    % Parallel comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/parallel_bar.png}
+        \label{fig:reference_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ v}
-    % CPP / Kokkos / Rust comparison
+    % Multi-nodal MPI comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/mpi_line.png}
+        \label{fig:reference_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ vi}
-    % Multi-nodal Strong scaling
+    % CPP / Kokkos / Rust comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/kokkos_line.png}
+        \label{fig:kokkos_line}
+    \end{figure}
 \end{frame}
 \begin{frame}{Overview of results \ vii}
-    % Multi-nodal Weak scaling
+    % CPP / Kokkos / Rust comparison
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{images/backup_screenshots/kokkos_bar.png}
+        \label{fig:kokkos_bar}
+    \end{figure}
 \end{frame}
-\begin{frame}{Overview of results \ viii}
+\begin{frame}{Back to the plan...}
+    \hyperlink{demo}{\beamerskipbutton{skip to demo slides}}
+\end{frame}
+\begin{frame}{Roofline Diagrams}
     % Add `lscpu` for my machine alongside it
     \begin{figure}[H]
         \includegraphics[width=0.55\textwidth]{images/Athena_ERT_generated_roofline.pdf}
@@ -1055,9 +1014,8 @@ fn test_ddot() {
         \label{fig:intelvtune}
     \end{figure}
 \end{frame}
-\begin{frame}{Back to the plan...}
-    \hyperlink{demo}{\beamerskipbutton{skip to demo slides}}
-\end{frame}
+
+
 
 % \begin{frame}[fragile]{Typography}
 %       \begin{verbatim}The theme provides sensible defaults to
